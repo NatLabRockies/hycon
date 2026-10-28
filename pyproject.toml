@@ -9,7 +9,7 @@ name = "hycon"
 version = "0.8"
 description = "Hybrid power plant controller."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 authors = [
     { name = "Michael (Misha) Sinner", email = "michael.sinner@nlr.gov" },
 ]
