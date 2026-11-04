@@ -39,6 +39,9 @@ hmodel.run()
 
 hmodel.logger.info("Process completed successfully")
 
+# Save internal controller signals
+hmodel.controller.write_log("outputs/controller_log.p")
+
 if generate_output_plots:
     plot_outputs()
     plt.show()

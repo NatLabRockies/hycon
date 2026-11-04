@@ -102,12 +102,15 @@ class HydrogenPlantController(ControllerBase):
         # Input filtering
         a = 0.05
         filtered_power = (1 - a / self.dt) * self.filtered_power_prev + a / self.dt * current_power
+        self.store("filtered_local_power", filtered_power)
 
         # Calculate difference between hydrogen reference and hydrogen actual
         hydrogen_error = hydrogen_reference - hydrogen_output
+        self.store("hydrogen_error", hydrogen_error)
 
         # Apply gain to generator power output
         power_reference = filtered_power + self.K * hydrogen_error
+        self.store("unclipped_power_reference", power_reference)
 
         if power_reference < 0:
             power_reference = 0

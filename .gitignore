@@ -14,6 +14,7 @@ examples/*/logstandin*
 examples/*/loghercules*
 examples/*/logfloris*
 *.pkl
+*.p
 *.h5
 
 # Exceptions

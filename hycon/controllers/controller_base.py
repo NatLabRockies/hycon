@@ -2,9 +2,12 @@ import copy
 import inspect
 from abc import ABCMeta, abstractmethod
 
+from hycon.logger import LoggerMixin
 
-class ControllerBase(metaclass=ABCMeta):
+
+class ControllerBase(LoggerMixin, metaclass=ABCMeta):
     def __init__(self, interface, cname=None, verbose=True):
+        super().__init__()
         self._s = interface
         self.verbose = verbose
 
@@ -34,6 +37,13 @@ class ControllerBase(metaclass=ABCMeta):
         self._controls_dict = self.compute_controls(self._measurements_dict)
 
         output_dict = self._send_controls(input_dict)
+
+        time = (
+            self._measurements_dict.get("time")
+            if isinstance(self._measurements_dict, dict)
+            else None
+        )
+        self.log(time)
 
         return output_dict
 
@@ -76,10 +86,23 @@ class ControllerBase(metaclass=ABCMeta):
         in the hybrid supervisory controller when querying component controllers for their desired
         power references without actually updating their states.
         """
-        self._initial_state = copy.deepcopy(self.__dict__)
-        controls_dict = self.compute_controls(measurements_dict)
-        self.__dict__.update(copy.deepcopy(self._initial_state))
-        return controls_dict
+        # Snapshot each logger in the tree (this controller and its sub-loggers) separately,
+        # excluding log caches, which are not controller state and grow over time. Mapping every
+        # logger to itself in the shared memo keeps references between loggers pointing at the
+        # original objects, which are then restored in place. Values stored during the
+        # hypothetical calculation are discarded by the restore.
+        loggers = self._logger_tree()
+        memo = {id(logger): logger for logger in loggers}
+        snapshots = []
+        for logger in loggers:
+            logger.__dict__.setdefault("_log_row", {})
+            state = {k: v for k, v in logger.__dict__.items() if k != "_log_cache"}
+            snapshots.append((logger, copy.deepcopy(state, memo)))
+        try:
+            return self.compute_controls(measurements_dict)
+        finally:
+            for logger, state in snapshots:
+                logger.__dict__.update(state)
 
     @abstractmethod
     def set_controller_parameters(self, **kwargs):

@@ -62,6 +62,7 @@ class PriceCurtailingController(ControllerBase):
                 + self.__class__.__name__
                 + "."
             )
+        self.store("RT_LMP", measurements_dict["RT_LMP"])
 
         # Threshold based on curtailment price
         measurements_dict_local = copy.deepcopy(measurements_dict)

@@ -11,6 +11,7 @@ parts:
   - caption: Controllers
     chapters:
     - file: controllers
+    - file: logging
   - caption: Interfaces
     chapters:
     - file: interfaces

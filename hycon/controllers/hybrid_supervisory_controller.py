@@ -178,4 +178,8 @@ class HybridSupervisoryControllerGeneric(ControllerBase):
 
             power_export_total += measurements_dict[cc.cname]["power"]
 
+        # Log variables of interest
+        self.store("locally_generated_power", locally_generated_power_total)
+        self.store("power_export_total", power_export_total)
+
         return controls_dict
