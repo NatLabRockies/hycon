@@ -75,6 +75,7 @@ producing:
 )
 
 Ramp rate limits are also applied in this example, but can be modified by changing the `ramp_rate_limit` variable in runscript.py or switched off by setting `ramp_rate_limit = None`.
+The version of the plot generated using the runscript also shows the application of individual turbine ramp rates. To keep documentation clear, the plots in this documentation have these individual turbine setpoints hidden.
 
 (examples_simplehybrid)=
 ## simple_hybrid_plant

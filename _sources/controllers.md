@@ -24,6 +24,8 @@ constructor for each controller must accept the following arguments:
 
 ## Available controllers
 
+For details on recording controller signals, see [Controller logging](logging.md).
+
 (controllers_luwakesteer)=
 ### LookupBasedWakeSteeringController
 Yaw controller that implements wake steering based on a lookup table.
