@@ -28,7 +28,7 @@ This file contains additional guidance for AI agents and other AI editors includ
 
 ## Commands
 
-- Test: `.venv/bin/python -m pytest tests/` when `.venv/` exists; otherwise `pytest tests/` (or a single file, e.g. `pytest tests/battery_simple_test.py`).
+- Test: `.venv/bin/python -m pytest tests/` when `.venv/` exists; otherwise `pytest tests/` (or a single file, e.g. `pytest tests/battery_controllers_test.py`).
 - Lint/format: `ruff check --fix . && ruff format .`
 - Pre-commit: `pre-commit run --all-files`
 
