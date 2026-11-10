@@ -10,7 +10,7 @@ of certain controllers and interfaces. For most examples, you will need to have 
 2-turbine example of lookup-based wake steering control with
 {ref}`controllers_luwakesteer`,
 run using Hercules (v1) with the FLORIS standin
-in place of AMR-Wind for exposition purposes. To run this example, navigate to the 
+in place of AMR-Wind for exposition purposes. To run this example, navigate to the
 examples/lookup-based_wake_steering_florisstandin folder and then run
 ```
 bash run_script.sh
@@ -24,7 +24,7 @@ Running the script performs several steps:
 1. It first executes construct_yaw_offsets.py, a python script for generating an
 optimized set of yaw offsets.
 
-2. It then uses the constructed yaw offsets to instantiate and run the wake 
+2. It then uses the constructed yaw offsets to instantiate and run the wake
 steering simulation.
 
 3. The time series output is plotted in plot_output_data.py
@@ -35,7 +35,7 @@ This should produce the following plot:
 )
 
 Note that in construct_yaw_offsets.py, the minimum and maximum offset are defined
-as 25 and -25 degrees, respectively. 
+as 25 and -25 degrees, respectively.
 
 The example can also be run with hysteresis added to the yaw controller to mitigate large yaw
 maneuvers near the aligned wind directions. To run with hysteresis, set `use_hysteresis = True` in
@@ -44,7 +44,7 @@ hercules_runscript.py. The simulation then produces the following plot:
     graphics/lookup-table-example-plot_hysteresis.png
 )
 
-Finally, an extra script is provided to compare various options for designing the wake steering 
+Finally, an extra script is provided to compare various options for designing the wake steering
 look-up tables. This is run using
 ```
 python compare_yaw_offset_designs.py
@@ -60,15 +60,15 @@ to restore full functionality for this example.
 
 (examples_wfpowertracking)=
 ## wind_farm_power_tracking
-2-turbine example of wind-farm-level power reference tracking with 
-{ref}`controllers_wfpowertracking` and {ref}`controllers_wfpowerdistributing`, 
-run using Hercules v2. To run this example, navigate to the 
+2-turbine example of wind-farm-level power reference tracking with
+{ref}`controllers_wfpowertracking` and {ref}`controllers_wfpowerdistributing`,
+run using Hercules v2. To run this example, navigate to the
 examples/wind_farm_power_tracking/ folder and execute the python runscript
 (runscript.py).
 
-This will run both a closed-loop controller, which compensates for underproduction at individual 
+This will run both a closed-loop controller, which compensates for underproduction at individual
 turbines, and an open-loop controller, which simply distributes the farm-wide reference evenly
-amongst the turbines of the farm without feedback. The resulting trajectories are plotted, 
+amongst the turbines of the farm without feedback. The resulting trajectories are plotted,
 producing:
 ![Results of wind_farm_power_tracking_florisstandin example](
     graphics/wf-power-tracking-plot.png
@@ -79,7 +79,7 @@ The version of the plot generated using the runscript also shows the application
 
 (examples_simplehybrid)=
 ## simple_hybrid_plant
-Example of a wind + solar + battery hybrid power plant using the 
+Example of a wind + solar + battery hybrid power plant using the
 {ref}`controllers_generichybrid` to
 track a steady power reference. The plant comprises 10 NREL 5MW reference wind turbines
 (50 MW total wind capacity); a 100MW solar PV array; and a 4-hour, 20MW battery (80MWh energy

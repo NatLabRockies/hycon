@@ -1,17 +1,17 @@
 # Controllers
 
 The `hycon.controllers` module contains a library of wind and hybrid power plant
-controllers. Each controller must inherit from `ControllerBase` (see 
+controllers. Each controller must inherit from `ControllerBase` (see
 controller_base.py) and implement a
-mandatory `compute_controls()` method, which contains the relevant control 
-algorithm. `compute_controls()` must accept a single argument dictionary 
+mandatory `compute_controls()` method, which contains the relevant control
+algorithm. `compute_controls()` must accept a single argument dictionary
 (nominally called `measurement_dict`) that contains the necessary input
 signals and return a second dictionary (nominally called `controls_dict`) that
-returns the control actions. In the basic set up, `measurement_dict` is 
+returns the control actions. In the basic set up, `measurement_dict` is
 provided to `compute_controls()` by the `step()` method defined on
 `ControllerBase`, and the returned `controls_dict` is then passed via the
 interface at the conclusion of the `step()` method. In addition, controllers must
-also implement a method `set_controller_parameters()` that accepts a dictionary of controller parameters. If no parameters are needed, this may simple be an empty 
+also implement a method `set_controller_parameters()` that accepts a dictionary of controller parameters. If no parameters are needed, this may simple be an empty
 method (but it is still required).
 
 ## Controller structure and inputs/outputs
@@ -30,7 +30,7 @@ For details on recording controller signals, see [Controller logging](logging.md
 ### LookupBasedWakeSteeringController
 Yaw controller that implements wake steering based on a lookup table.
 `controller_parameters` may include keys:
--  `df_yaw`: dataframe as produced by a FLORIS yaw optimization routine that contains the lookup table for wake steering. The keys of this dictionary are tuples of the form `(wind_direction, wind_speed)`, and the values are lists of yaw angles for each turbine in the farm. The lookup table is sampled at 10 degree increments of wind direction and 1 m/s increments of wind speed, but this may be updated in the future to allow for more flexible sampling. See example 
+-  `df_yaw`: dataframe as produced by a FLORIS yaw optimization routine that contains the lookup table for wake steering. The keys of this dictionary are tuples of the form `(wind_direction, wind_speed)`, and the values are lists of yaw angles for each turbine in the farm. The lookup table is sampled at 10 degree increments of wind direction and 1 m/s increments of wind speed, but this may be updated in the future to allow for more flexible sampling. See example
 lookup-based_wake_steering_florisstandin for example usage.
 - `hysteresis_dict`: dictionary of hysteresis zones for wake steering.
 - `yaw_IC`: initial yaw angles for the turbines.
@@ -46,27 +46,27 @@ Not yet developed. May be combined into a universal simple LookupBasedWakeSteeri
 (controllers_wfpowerdistributing)=
 ### WindFarmPowerDistributingController
 
-Wind farm-level power controller that simply distributes a farm-level power 
-reference between wind turbines evenly, without checking whether turbines are 
+Wind farm-level power controller that simply distributes a farm-level power
+reference between wind turbines evenly, without checking whether turbines are
 able to produce power at the requested level. Not expected to perform well when
-wind turbines are waked or cannot produce the desired power for other reasons. 
-However, is a useful comparison case for the WindFarmPowerTrackingController 
-(described below). 
+wind turbines are waked or cannot produce the desired power for other reasons.
+However, is a useful comparison case for the WindFarmPowerTrackingController
+(described below).
 `controller_parameters` may include keys:
 - `ramp_rate_limit`: a limit on the ramp rate for the entire plant, in units of kW/s.
 
 (controllers_wfpowertracking)=
 ### WindFarmPowerTrackingController
 
-Closed-loop wind farm-level power controller that distributes a farm-level 
+Closed-loop wind farm-level power controller that distributes a farm-level
 power reference among the wind turbines in a farm and adjusts the requests made
-from each turbine depending on whether the power reference has been met. 
-Further details provided in 
+from each turbine depending on whether the power reference has been met.
+Further details provided in
 [Sinner et al.](https://pubs.aip.org/aip/jrse/article/15/5/053304/2913100).
 
-Integral action, as well as gain scheduling based on turbine saturation, has been disabled as 
-simple proportional control appears sufficient currently. However, these may be enabled at a 
-later date if needed. 
+Integral action, as well as gain scheduling based on turbine saturation, has been disabled as
+simple proportional control appears sufficient currently. However, these may be enabled at a
+later date if needed.
 
 `controller_parameters` may include keys:
 - `proportional_gain`: the proportional gain for the controller.
@@ -87,7 +87,7 @@ Reads in current power production from various components, as well as a possible
 
 Controller to trade off battery demand response with battery degradation. The
 `BatteryController` takes as an input the higher-level battery power reference,
-and produces a modified ("input-shaped") reference with the intention of 
+and produces a modified ("input-shaped") reference with the intention of
 reducing wear and tear on the battery. Designed to create a second-order closed-loop
 system response to reference inputs.
 Generally speaking, increasing the controller gain `k_batt` increases the natural
@@ -99,9 +99,9 @@ battery at high and low states of charge (SOC). This throttling is applied by sp
 four SOC thresholds between 0 and 1: below the first threshold, the reference is nullified;
 between the first and second, the output reference is linearly ramped up; between the second
 and third, the full reference is used; between the third and fourth, the output reference is
-linearly ramped down; and above the fourth, the reference is again nullified. Examples of 
+linearly ramped down; and above the fourth, the reference is again nullified. Examples of
 this are shown below. These are specified by passing a four-element list of fractional
-SOCs to 
+SOCs to
 `clipping_thresholds`, e.g. `clipping_thresholds=[0.1, 0.2, 0.8, 0.9]`.
 The default is to apply the full reference across the full range of SOCs, i.e.
 `clipping_thresholds=[0, 0, 1, 1]`.

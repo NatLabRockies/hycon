@@ -22,7 +22,7 @@ hercules_comms:
         use_dash_frontend: False
         KAFKA: False
         KAFKA_topics: EMUV1py
-        helics: 
+        helics:
             # deltat: 1 # This will be assigned in software
             subscription_topics: [status]
             publication_topics: [control]
@@ -32,7 +32,7 @@ hercules_comms:
         endpoint_interval: 1
         starttime: 0
         stoptime: 100
-        
+
         Agent: ControlCenter
 
 py_sims:
@@ -41,10 +41,3 @@ controller:
   num_turbines: 2 # Should match AMR-Wind! Ideally, would come from AMR-wind
   initial_conditions:
       yaw: 270. # degrees (same for all turbines) (will this work?)
-
-
-
-
-
-
-
