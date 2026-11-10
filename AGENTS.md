@@ -27,7 +27,7 @@ This file contains additional guidance for AI agents and other AI editors includ
 
 ## Testing and formatting
 
-- Test: `.venv/bin/python -m pytest tests/` when `.venv/` exists; otherwise `pytest tests/` (or a single file, e.g. `pytest tests/battery_controllers_test.py`).
+- Test: `.venv/bin/python -m pytest tests/` when `.venv/` exists; otherwise `pytest .` (or a single file, e.g. `pytest tests/battery_controllers_test.py`).
 - Pre-commit: `pre-commit run --all-files`
 - Write self-contained test functions, comprehensible to a human reviewer, with a short comment stating the purpose.
 - Focus on core behavior and catching regressions rather than exhaustive edge cases;
