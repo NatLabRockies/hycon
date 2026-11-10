@@ -4,9 +4,8 @@ This file contains additional guidance for AI agents and other AI editors includ
 
 ## Project Context
 
-- Hycon is an open-source repository of controllers for hybrid power plants
-- Hycon is often paired with Hercules for simulation and ENPAX for cost modeling.
-- Hercules is an open-source hybrid power plant simulator.
+- Hycon is an open-source library of controllers for hybrid power plants
+- Hycon is often paired with Hercules (hybrid power plant simulator) and ENPAX (cost modeling).
 
 ## Rules for agents
 
@@ -16,22 +15,6 @@ This file contains additional guidance for AI agents and other AI editors includ
 - If `.venv/` exists, use `.venv/bin/python` for running examples, tests, etc. (e.g. `.venv/bin/python -m pytest`).
 - Append "(AI)" to inline comments written by an agent (not docstrings).
 
-## Communication
-
-- Avoid flattery, avoid filler phrases, prefer technical clarity over marketing tone.
-
-## Git rules
-
-- Agents can use information gathering commands like diff
-- Agents should never push, pull or fetch
-- Agents should avoid committing, but can commit with permission
-
-## Commands
-
-- Test: `.venv/bin/python -m pytest tests/` when `.venv/` exists; otherwise `pytest tests/` (or a single file, e.g. `pytest tests/battery_controllers_test.py`).
-- Lint/format: `ruff check --fix . && ruff format .`
-- Pre-commit: `pre-commit run --all-files`
-
 ## Python Style
 
 - Use Google-style docstrings for public functions, classes, and methods
@@ -40,12 +23,22 @@ This file contains additional guidance for AI agents and other AI editors includ
 - Format with Ruff.
 - Run `pre-commit run --all-files` before finishing.
 - Favor readability first: straightforward control flow, minimal nesting, clear
-  names. Avoid heavy abstractions (extra inheritance layers, dataclasses,
-  metaclasses) 
+  names. Avoid heavy abstractions.
 
-## Tests
+## Testing and formatting
 
-- Write self-contained test functions, comprehensible to a human reviewer, with simple
-  inline inputs (no fixtures) and a short comment stating the purpose.
+- Test: `.venv/bin/python -m pytest tests/` when `.venv/` exists; otherwise `pytest tests/` (or a single file, e.g. `pytest tests/battery_controllers_test.py`).
+- Pre-commit: `pre-commit run --all-files`
+- Write self-contained test functions, comprehensible to a human reviewer, with a short comment stating the purpose.
 - Focus on core behavior and catching regressions rather than exhaustive edge cases;
   prefer fewer, targeted tests.
+
+## Git rules
+
+- Agents can use information gathering commands like diff
+- Agents may never push, pull or fetch
+- Agents should avoid committing. Agents must ask for explicit permission before making any commit.
+
+## Communication
+
+- Avoid flattery, avoid filler phrases, prefer technical clarity over marketing tone.
