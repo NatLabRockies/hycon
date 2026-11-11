@@ -16,14 +16,14 @@ plant:
 wind_farm:
   component_type: WindFarm
   wake_method: precomputed
-  floris_input_file: ../example_inputs/floris_input_10turbine.yaml
+  floris_input_filename: ../example_inputs/floris_input_10turbine.yaml
   wind_input_filename: ../example_inputs/wind_input.csv
-  turbine_file_name: ../example_inputs/turbine_filter_model.yaml
-  log_file_name: log_wind_sim.log
+  turbine_filename: ../example_inputs/turbine_filter_model.yaml
+  log_filename: log_wind_sim.log
   log_channels:
     - power
     - turbine_powers
-  floris_update_time_s: 300.0 # Update wakes every 5 minutes
+  floris_update_time: 300.0 # Update wakes every 5 minutes
 
 solar_farm:
     component_type: SolarPySAMPVWatts
@@ -37,28 +37,27 @@ solar_farm:
     losses: 0
     log_channels:
       - power
-      - dni
-      - aoi
+      - DNI
+      - AOI
 
     initial_conditions:
       power: 25000 # kW
-      dni: 1000
-      poa: 1000
+      DNI: 1000
+      POA: 1000
 
 battery:
-  component_type: BatterySimple
-  size: 20000  # kW size of the battery
+  component_type: BatteryDynamic
   energy_capacity: 80000 # total capacity of the battery in kWh (4-hour 20 MW battery)
-  charge_rate: 20000 # charge rate of the battery in kW
-  discharge_rate: 20000 # discharge rate of the battery in kW
-  max_SOC: 0.9 # upper boundary on battery SOC
-  min_SOC: 0.1 # lower boundary on battery SOC
+  power_charge_max: 20000 # charge rate of the battery in kW
+  power_discharge_max: 20000 # discharge rate of the battery in kW
+  SOC_max: 0.9 # upper boundary on battery SOC
+  SOC_min: 0.1 # lower boundary on battery SOC
   allow_grid_power_consumption: False
   initial_conditions:
     SOC: 0.88   # initial state of charge of the battery in percentage of total size
   log_channels:
     - power
-    - soc
+    - SOC
 
 external_data:
-  external_data_file: plant_power_reference.csv
+  external_data_filename: plant_power_reference.csv

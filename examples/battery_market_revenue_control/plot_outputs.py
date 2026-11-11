@@ -168,7 +168,7 @@ def plot_outputs():
 
     color = "C0"
     ax2.set_ylabel("State of charge [-]", color=color)
-    ax2.plot(df["time"], df["battery.soc"], color=color)
+    ax2.plot(df["time"], df["battery.SOC"], color=color)
     ax2.tick_params(axis="y", labelcolor=color)
 
     for ax in axarr:

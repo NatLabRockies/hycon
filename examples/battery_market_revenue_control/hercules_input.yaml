@@ -17,20 +17,19 @@ plant:
   interconnect_limit: 10000 # kW
 
 battery:
-  component_type: BatterySimple
-  size: 10000 # kW size of the battery (10 MW)
+  component_type: BatteryDynamic
   energy_capacity: 40000 # total capacity of the battery in kWh (10 MWh)
-  charge_rate: 10000 # charge rate in kW (10 MW)
-  discharge_rate: 10000 # discharge rate in kW (10 MW)
-  max_SOC: 0.9
-  min_SOC: 0.1
+  power_charge_max: 10000 # charge rate in kW (10 MW)
+  power_discharge_max: 10000 # discharge rate in kW (10 MW)
+  SOC_max: 0.9
+  SOC_min: 0.1
   allow_grid_power_consumption: True
   initial_conditions:
     SOC: 0.5
   log_channels:
     - power
-    - soc
+    - SOC
     - power_setpoint
 
 external_data:
-  external_data_file: lmp_data.csv
+  external_data_filename: lmp_data.csv
