@@ -17,7 +17,7 @@ def test_BatteryController(test_hercules_dict):
     # Test when starting with 0 power output
     power_ref = 1000
     test_hercules_dict["battery"]["power"] = 0
-    test_hercules_dict["battery"]["soc"] = 0.3
+    test_hercules_dict["battery"]["SOC"] = 0.3
     test_hercules_dict["battery"]["power_reference"] = power_ref
     test_controller.step(test_hercules_dict)
     out_0 = test_controller._controls_dict["battery"]["power_setpoint"]
@@ -59,7 +59,7 @@ def test_BatteryController(test_hercules_dict):
 
     # at 30% SOC, all should match if power reference is small
     test_hercules_dict["battery"]["power"] = 0.0
-    test_hercules_dict["battery"]["soc"] = 0.3
+    test_hercules_dict["battery"]["SOC"] = 0.3
     test_hercules_dict["external_signals"]["plant_power_reference"] = power_ref
     test_controller_0 = BatteryController(
         test_interface,
@@ -105,7 +105,7 @@ def test_BatteryController(test_hercules_dict):
 
     # at 85% SOC and large reference, 1 should be clipped
     test_hercules_dict["battery"]["power"] = 0.0
-    test_hercules_dict["battery"]["soc"] = 0.85
+    test_hercules_dict["battery"]["SOC"] = 0.85
     test_controller_0.x = 0
     test_controller_1.x = 0
     test_controller_0.step(test_hercules_dict)
@@ -144,9 +144,10 @@ def test_BatteryPriceSOCController_init(test_hercules_dict):
     test_controller = BatteryPriceSOCController(test_interface, "battery")
 
     # Check that the controller is initialized correctly
-    assert test_controller.rated_power_charging == test_hercules_dict["battery"]["charge_rate"]
+    assert test_controller.rated_power_charging == test_hercules_dict["battery"]["power_charge_max"]
     assert (
-        test_controller.rated_power_discharging == test_hercules_dict["battery"]["discharge_rate"]
+        test_controller.rated_power_discharging
+        == test_hercules_dict["battery"]["power_discharge_max"]
     )
 
 

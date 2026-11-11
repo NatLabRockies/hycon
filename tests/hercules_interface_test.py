@@ -17,7 +17,7 @@ def test_HerculesInterface_windonly(test_hercules_dict):
     assert interface.dt == test_hercules_dict["dt"]
     assert (
         interface.plant_parameters["wind_farm"]["capacity"]
-        == (test_hercules_dict["wind_farm"]["capacity"])
+        == (test_hercules_dict["wind_farm"]["capacity_rated"])
     )
     assert (
         interface.plant_parameters["wind_farm"]["n_turbines"]
@@ -72,15 +72,15 @@ def test_HerculesInterface_hybrid(test_hercules_dict):
     assert interface.dt == test_hercules_dict["dt"]
     assert (
         interface.plant_parameters["wind_farm"]["capacity"]
-        == (test_hercules_dict["wind_farm"]["capacity"])
+        == (test_hercules_dict["wind_farm"]["capacity_rated"])
     )
     assert (
         interface.plant_parameters["solar_farm"]["capacity"]
-        == (test_hercules_dict["solar_farm"]["capacity"])
+        == (test_hercules_dict["solar_farm"]["capacity_rated"])
     )
     assert (
         interface.plant_parameters["battery"]["power_capacity"]
-        == (test_hercules_dict["battery"]["size"])
+        == (test_hercules_dict["battery"]["power_discharge_max"])
     )
     assert (
         interface.plant_parameters["battery"]["energy_capacity"]
@@ -104,7 +104,11 @@ def test_HerculesInterface_hybrid(test_hercules_dict):
     )
     assert measurements["solar_farm"]["power"] == test_hercules_dict["solar_farm"]["power"]
     assert measurements["battery"]["power"] == test_hercules_dict["battery"]["power"]
-    assert measurements["battery"]["state_of_charge"] == test_hercules_dict["battery"]["soc"]
+    assert measurements["battery"]["state_of_charge"] == test_hercules_dict["battery"]["SOC"]
+    assert (
+        measurements["solar_farm"]["power_hypothetical"]
+        == test_hercules_dict["solar_farm"]["power_hypothetical"]
+    )
 
     # Test check_controls()
     controls_dict = {
