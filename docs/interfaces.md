@@ -36,6 +36,10 @@ messages between workers.
 
 ## Deprecated interfaces
 
+### HerculesV2Interface
+For direct python communication with Hercules v2. Identical to `HerculesInterface` but reads the
+Hercules v2 key names (e.g. `soc`, `charge_rate`, `capacity`), which were renamed in Hercules v3.
+
 ### HerculesADInterface
 For direct python communication with Hercules v1. This should be instantiated
 in a runscript that is running Hercules; used to generate a `controller` from
