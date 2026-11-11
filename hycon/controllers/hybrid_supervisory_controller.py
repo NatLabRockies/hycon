@@ -73,7 +73,7 @@ class HybridSupervisoryControllerGeneric(ControllerBase):
             self.curtailment_order = list(range(len(component_controllers) - 1, -1, -1))
         elif len(curtailment_order) != len(component_controllers):
             raise ValueError("curtailment_order must be the same length as component_controllers.")
-        elif not all([type(c) is int and c >= 0 for c in curtailment_order]):
+        elif not all([isinstance(c, int) and c >= 0 for c in curtailment_order]):
             raise ValueError(
                 "All entries in curtailment_order must be non-negative integers corresponding to "
                 "indices of component_controllers."
