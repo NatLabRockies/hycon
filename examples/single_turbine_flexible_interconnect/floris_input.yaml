@@ -19,7 +19,7 @@ farm:
   - 0.0
   layout_y:
   - 0.0
-  turbine_type: 
+  turbine_type:
   - wind_turbine.yaml
   turbine_library_path: ./
 

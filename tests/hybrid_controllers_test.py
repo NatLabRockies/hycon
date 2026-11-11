@@ -147,9 +147,9 @@ def test_HybridSupervisoryControllerGeneric_subsets(test_hercules_dict, test_int
     assert np.isclose(battery_setpoint_test, -100.0 - solar_current)
 
     # Switch to not allowing grid charging, capped at solar output
-    test_controller.component_controllers[1].plant_parameters["battery"]["allow_grid_charging"] = (
-        False
-    )
+    test_controller.component_controllers[1].plant_parameters["battery"][
+        "allow_grid_charging"
+    ] = False
     out_dict = test_controller.step(test_hercules_dict)
     battery_setpoint_test = out_dict["battery"]["power_setpoint"]
     assert np.isclose(battery_setpoint_test, -solar_current)
@@ -219,9 +219,9 @@ def test_HybridSupervisoryControllerGeneric_limits(test_hercules_dict, test_inte
     assert np.isclose(battery_setpoint_test, interconnect_limit - solar_current)
 
     # Now check lower limit for no grid charging case
-    test_controller.component_controllers[1].plant_parameters["battery"]["allow_grid_charging"] = (
-        True
-    )
+    test_controller.component_controllers[1].plant_parameters["battery"][
+        "allow_grid_charging"
+    ] = True
     solar_current = 500.0
     power_ref = -100.0
     test_hercules_dict["external_signals"]["plant_power_reference"] = power_ref
@@ -232,9 +232,9 @@ def test_HybridSupervisoryControllerGeneric_limits(test_hercules_dict, test_inte
     assert np.isclose(battery_setpoint_test, power_ref - solar_current)
 
     # Switch to disallowing grid charging
-    test_controller.component_controllers[1].plant_parameters["battery"]["allow_grid_charging"] = (
-        False
-    )
+    test_controller.component_controllers[1].plant_parameters["battery"][
+        "allow_grid_charging"
+    ] = False
     out_dict = test_controller.step(test_hercules_dict)
     battery_setpoint_test = out_dict["battery"]["power_setpoint"]
 

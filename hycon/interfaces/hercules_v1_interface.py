@@ -71,9 +71,9 @@ class HerculesV1ADInterface(InterfaceBase):
         )
 
         hercules_dict["hercules_comms"]["amr_wind"][self.wf_name]["turbine_yaw_angles"] = yaw_angles
-        hercules_dict["hercules_comms"]["amr_wind"][self.wf_name]["turbine_power_setpoints"] = (
-            power_setpoints
-        )
+        hercules_dict["hercules_comms"]["amr_wind"][self.wf_name][
+            "turbine_power_setpoints"
+        ] = power_setpoints
 
         return hercules_dict
 
