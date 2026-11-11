@@ -42,7 +42,7 @@ develop = [
     "isort"
 ]
 examples = [
-    "nlr-hercules~=2.2"
+    "nlr-hercules @ git+https://github.com/NatLabRockies/hercules.git@v3-dev"
 ]
 
 [tool.setuptools.packages.find]
