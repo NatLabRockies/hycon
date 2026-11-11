@@ -6,28 +6,34 @@ from hycon.interfaces.interface_base import InterfaceBase
 # Key: Hercules name. Value: Name to use in controller measurements dictionary
 hercules_data_channel_map = {
     "power": "power",
+    "power_hypothetical": "power_hypothetical",
     "power_reference": "power_reference",
-    "soc": "state_of_charge",
+    "SOC": "state_of_charge",
     "turbine_powers": "turbine_powers",
     "turbine_speeds": "turbine_speeds",
     "wind_direction_mean": "wind_direction_mean",
-    "dni": "direct_normal_irradiance",
-    "aoi": "angle_of_incidence",
-    "H2_mfr": "production_rate",
+    "DNI": "direct_normal_irradiance",
+    "AOI": "angle_of_incidence",
+    "H2_MFR": "production_rate",
 }
 
 # List of valid Hercules component types recognized by Hycon
 hercules_wind_types = ["WindFarm"]
 hercules_solar_types = ["SolarPySAMPVWatts"]
-hercules_battery_types = ["BatteryLithiumIon", "BatterySimple"]
+hercules_battery_types = ["BatteryDynamic", "BatteryLithiumIon", "BatteryReservoir"]
 hercules_hydrogen_types = ["ElectrolyzerPlant"]
-hercules_thermal_types = ["HardCoalSteamTurbine", "OpenCycleGasTurbine"]
+hercules_thermal_types = [
+    "CombinedCyclePlant",
+    "LinearGenerator",
+    "OpenCycleGasTurbine",
+    "SteamTurbine",
+]
 hercules_playback_types = ["PowerPlayback"]
 
 
 class HerculesInterface(InterfaceBase):
     """
-    Class for interfacing with Hercules v2 simulator.
+    Class for interfacing with Hercules v3 simulator.
     """
 
     def __init__(self, h_dict):
@@ -51,7 +57,7 @@ class HerculesInterface(InterfaceBase):
                 self.plant_parameters[c] = {
                     "type": "wind",  # needed?
                     "component_category": "generator",
-                    "capacity": h_dict[c]["capacity"],
+                    "capacity": h_dict[c]["capacity_rated"],
                     "n_turbines": h_dict[c]["n_turbines"],
                     "turbines": range(h_dict[c]["n_turbines"]),
                 }
@@ -59,19 +65,19 @@ class HerculesInterface(InterfaceBase):
                 self.plant_parameters[c] = {
                     "type": "solar",
                     "component_category": "generator",
-                    "capacity": h_dict[c]["capacity"],
+                    "capacity": h_dict[c]["capacity_rated"],
                 }
             elif c_type in hercules_battery_types:
                 self.plant_parameters[c] = {
                     "type": "battery",
                     "component_category": "storage",
-                    "power_capacity": h_dict[c]["size"],
+                    "power_capacity": h_dict[c]["power_discharge_max"],
                     "energy_capacity": h_dict[c]["energy_capacity"],
-                    "charge_rate": h_dict[c]["charge_rate"],
-                    "discharge_rate": h_dict[c]["discharge_rate"],
+                    "charge_rate": h_dict[c]["power_charge_max"],
+                    "discharge_rate": h_dict[c]["power_discharge_max"],
                     "allow_grid_charging": h_dict[c].get("allow_grid_power_consumption", True),
-                    "state_of_charge_max": h_dict[c].get("max_SOC", 1.0),
-                    "state_of_charge_min": h_dict[c].get("min_SOC", 0.0),
+                    "state_of_charge_max": h_dict[c].get("SOC_max", 1.0),
+                    "state_of_charge_min": h_dict[c].get("SOC_min", 0.0),
                 }
             elif c_type in hercules_hydrogen_types:
                 self.plant_parameters[c] = {"type": "hydrogen", "component_category": "load"}
