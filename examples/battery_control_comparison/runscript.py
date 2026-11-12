@@ -63,7 +63,7 @@ def simulate(soc_0, clipping_thresholds, gain):
     # Extract the signals for plotting
     df_out = HerculesOutput("outputs/hercules_output.h5").df
     power_sequence = df_out["battery.power"].to_numpy()
-    soc_sequence = df_out["battery.SOC"].to_numpy()
+    soc_sequence = df_out["battery.soc"].to_numpy()
     time = df_out["time"].to_numpy()
     reference_sequence = df_out["external_signals.plant_power_reference"].to_numpy()
 

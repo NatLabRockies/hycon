@@ -15,7 +15,7 @@ def plot_outputs():
         print(c)
 
     # Get high-level signals
-    power_output = df["plant.power_bus"]
+    power_output = df["plant.power"]
     time = df["time"] / 60  # minutes
     power_ref_input = df["external_signals.plant_power_reference"]
 
@@ -57,7 +57,7 @@ def plot_outputs():
 
     # Plot the battery power and state of charge, if battery component included
     if not (battery_power == 0).all():
-        battery_soc = df["battery.SOC"]
+        battery_soc = df["battery.soc"]
         figb, ax = plt.subplots(2, 1, sharex=True, figsize=(7, 5))
         ax[0].plot(time, battery_power / 1e3, color=battery_col)
         ax[1].plot(time, battery_soc, color=battery_col)
@@ -69,8 +69,8 @@ def plot_outputs():
 
     # Plot the solar data, if solar component included in Hercules.
     if not (solar_power == 0).all():
-        angle_of_incidence = df["solar_farm.AOI"]
-        direct_normal_irradiance = df["solar_farm.DNI"]
+        angle_of_incidence = df["solar_farm.aoi"]
+        direct_normal_irradiance = df["solar_farm.dni"]
         figs, ax = plt.subplots(3, 1, sharex=True, figsize=(7, 5))
         ax[0].plot(time, solar_power / 1e3, color="C1")
         ax[0].set_ylabel("Solar power [MW]")

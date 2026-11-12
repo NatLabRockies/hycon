@@ -15,15 +15,15 @@ plant:
 wind_farm:
   component_type: WindFarm
   wake_method: precomputed
-  floris_input_filename: ../example_inputs/floris_input_2turbine.yaml
+  floris_input_file: ../example_inputs/floris_input_2turbine.yaml
   wind_input_filename: wind_input.csv
-  turbine_filename: ../example_inputs/turbine_filter_model.yaml
-  log_filename: outputs/log_wind_sim.log
+  turbine_file_name: ../example_inputs/turbine_filter_model.yaml
+  log_file_name: outputs/log_wind_sim.log
   log_channels:
     - power
     - turbine_powers
     - turbine_power_setpoints
-  floris_update_time: 300.0 # Update wakes every 5 minutes
+  floris_update_time_s: 300.0 # Update wakes every 5 minutes
 
 external_data:
-  external_data_filename: wind_power_reference.csv
+  external_data_file: wind_power_reference.csv
