@@ -23,9 +23,20 @@ These methods will all be called in the `step()` method of `ControllerBase`.
 
 ### HerculesInterface
 
-For direct python communication with the latest version of Hercules. This should be instantiated
+For direct python communication with the current release of Hercules. This should be instantiated
 in a runscript that is running Hercules; used to generate a `controller` from the Hycon controllers submodule; and that `controller` should be passed to the
 `HerculesModel` after instantiation via `HerculesModel.assign_controller()`. The main purpose for this interface is for sending power reference signals to various types of hybrid plant components modeled in Hercules (and receiving state measurements from the components as well as external signals like electricity price).
+
+`HerculesInterface` is an alias to the interface for the current Hercules release, currently
+`HerculesV2Interface`.
+
+### HerculesV2Interface
+For Hercules v2 (the current release). Reads the Hercules v2 key names (e.g. `soc`,
+`charge_rate`, `capacity`).
+
+### HerculesV3Interface
+For Hercules v3 (in development). Reads the key names introduced by the Hercules v3 nomenclature
+refactor (e.g. `SOC`, `power_charge_max`, `capacity_rated`).
 
 ## Interfaces in development
 

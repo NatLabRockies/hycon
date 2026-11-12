@@ -34,7 +34,7 @@ def test_HybridSupervisoryControllerGeneric_reference_tracking(
     wind_current = 900
     power_ref = 1000
 
-    battery_charge_rate = test_hercules_dict["battery"]["charge_rate"]
+    battery_charge_rate = test_hercules_dict["battery"]["power_charge_max"]
 
     # Simply test the supervisory_control method, for the time being
     test_hercules_dict["external_signals"]["plant_power_reference"] = power_ref
@@ -75,7 +75,7 @@ def test_HybridSupervisoryControllerGeneric_subsets(test_hercules_dict, test_int
     test_hercules_dict["wind_farm"]["power"] = wind_current
     test_hercules_dict["solar_farm"]["power"] = solar_current
 
-    battery_charge_rate = test_hercules_dict["battery"]["charge_rate"]
+    battery_charge_rate = test_hercules_dict["battery"]["power_charge_max"]
 
     # Establish lower controllers
     wind_controller = WindFarmPowerTrackingController(test_interface, "wind_farm")
@@ -270,7 +270,7 @@ def test_HydrogenPlantController(test_hercules_dict, test_interface_hercules):
 
     wind_current = [600, 300]
     hydrogen_ref = 0.028
-    hydrogen_output = test_herc_dict_windonly["electrolyzer"]["H2_mfr"]
+    hydrogen_output = test_herc_dict_windonly["electrolyzer"]["H2_MFR"]
     hydrogen_error = hydrogen_ref - hydrogen_output
 
     # Simply test the supervisory_control method, for the time being
