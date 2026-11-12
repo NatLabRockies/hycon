@@ -4,14 +4,14 @@ from hycon.controllers import (
     BatteryPriceSOCController,
 )
 from hycon.interfaces import (
-    HerculesInterface,
+    HerculesV3Interface,
 )
 
 
 def test_BatteryController(test_hercules_dict):
     test_hercules_dict["component_names"] = ["battery"]
 
-    test_interface = HerculesInterface(test_hercules_dict)
+    test_interface = HerculesV3Interface(test_hercules_dict)
     test_controller = BatteryController(test_interface, "battery", {"k_batt": 0.1})
 
     # Test when starting with 0 power output
@@ -138,7 +138,7 @@ def test_BatteryController(test_hercules_dict):
 
 
 def test_BatteryPriceSOCController_init(test_hercules_dict):
-    test_interface = HerculesInterface(test_hercules_dict)
+    test_interface = HerculesV3Interface(test_hercules_dict)
 
     # Initialize controller
     test_controller = BatteryPriceSOCController(test_interface, "battery")
@@ -154,7 +154,7 @@ def test_BatteryPriceSOCController_init(test_hercules_dict):
 def test_BatteryPriceSOCController_compute_controls(test_hercules_dict):
     # This test originally written assuming 4-hour battery
 
-    test_interface = HerculesInterface(test_hercules_dict)
+    test_interface = HerculesV3Interface(test_hercules_dict)
 
     # Initialize controller
     test_controller = BatteryPriceSOCController(test_interface, "battery")
@@ -214,7 +214,7 @@ def test_BatteryPriceSOCController_compute_controls(test_hercules_dict):
 def test_BatteryPriceSOCController_compute_controls_2_hour_duration(test_hercules_dict):
     # Set the duration to 2 hours
     test_hercules_dict["battery"]["energy_capacity"] = 20.0e3
-    test_interface = HerculesInterface(test_hercules_dict)
+    test_interface = HerculesV3Interface(test_hercules_dict)
 
     # Initialize controller
     test_controller = BatteryPriceSOCController(test_interface, "battery")

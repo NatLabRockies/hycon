@@ -31,7 +31,7 @@ hercules_thermal_types = [
 hercules_playback_types = ["PowerPlayback"]
 
 
-class HerculesInterface(InterfaceBase):
+class HerculesV3Interface(InterfaceBase):
     """
     Class for interfacing with Hercules v3 simulator.
     """

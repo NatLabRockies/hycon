@@ -8,4 +8,5 @@ from hycon.interfaces.hercules_v1_interface import (
     HerculesV1HybridADInterface,
 )
 from hycon.interfaces.hercules_v2_interface import HerculesV2Interface
+from hycon.interfaces.hercules_v3_interface import HerculesV3Interface
 from hycon.interfaces.rosco_zmq_interface import ROSCO_ZMQInterface

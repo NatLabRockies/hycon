@@ -1,5 +1,5 @@
 import pytest
-from hycon.interfaces import HerculesADInterface, HerculesHybridADInterface, HerculesInterface
+from hycon.interfaces import HerculesADInterface, HerculesHybridADInterface, HerculesV3Interface
 from hycon.interfaces.interface_base import InterfaceBase
 
 
@@ -177,9 +177,9 @@ def test_interface_standin():
 @pytest.fixture
 def test_interface_hercules(test_hercules_dict):
     """
-    Fixture to create a Hercules v2 dictionary for testing.
+    Fixture to create a Hercules v3 interface for testing.
     """
-    return HerculesInterface(test_hercules_dict)
+    return HerculesV3Interface(test_hercules_dict)
 
 
 @pytest.fixture

@@ -1,10 +1,15 @@
 import pytest
-from hycon.interfaces import HerculesV2Interface
+from hycon.interfaces import HerculesInterface, HerculesV2Interface
+
+
+def test_HerculesInterface_alias():
+    # HerculesInterface should point at the interface for the current Hercules release (v2)
+    assert HerculesInterface is HerculesV2Interface
 
 
 def test_v2_interface_instantiation(test_hercules_v2_dict):
     """
-    Tests that the deprecated Hercules v2 interface instantiates with v2 key names.
+    Tests that the Hercules v2 interface instantiates with v2 key names.
     """
 
     _ = HerculesV2Interface(h_dict=test_hercules_v2_dict)

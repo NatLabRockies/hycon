@@ -1,5 +1,5 @@
 import pytest
-from hycon.interfaces import HerculesInterface
+from hycon.interfaces import HerculesV3Interface
 
 
 def test_interface_instantiation(test_hercules_dict):
@@ -8,12 +8,12 @@ def test_interface_instantiation(test_hercules_dict):
     each implement the required methods specified by InterfaceBase.
     """
 
-    _ = HerculesInterface(h_dict=test_hercules_dict)
+    _ = HerculesV3Interface(h_dict=test_hercules_dict)
 
 
-def test_HerculesInterface_windonly(test_hercules_dict):
+def test_HerculesV3Interface_windonly(test_hercules_dict):
     # Test instantiation
-    interface = HerculesInterface(h_dict=test_hercules_dict)
+    interface = HerculesV3Interface(h_dict=test_hercules_dict)
     assert interface.dt == test_hercules_dict["dt"]
     assert (
         interface.plant_parameters["wind_farm"]["capacity"]
@@ -66,9 +66,9 @@ def test_HerculesInterface_windonly(test_hercules_dict):
         interface.send_controls(test_hercules_dict, **bad_controls_dict1)
 
 
-def test_HerculesInterface_hybrid(test_hercules_dict):
+def test_HerculesV3Interface_hybrid(test_hercules_dict):
     # Test instantiation
-    interface = HerculesInterface(h_dict=test_hercules_dict)
+    interface = HerculesV3Interface(h_dict=test_hercules_dict)
     assert interface.dt == test_hercules_dict["dt"]
     assert (
         interface.plant_parameters["wind_farm"]["capacity"]

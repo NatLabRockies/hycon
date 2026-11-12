@@ -27,7 +27,7 @@ hercules_playback_types = ["PowerPlayback"]
 
 class HerculesV2Interface(InterfaceBase):
     """
-    Class for interfacing with Hercules v2 simulator (deprecated; use HerculesInterface for v3).
+    Class for interfacing with Hercules v2 simulator.
     """
 
     def __init__(self, h_dict):
