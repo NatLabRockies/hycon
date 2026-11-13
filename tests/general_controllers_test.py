@@ -75,3 +75,24 @@ def test_PriceCurtailingController(test_hercules_dict, test_interface_hercules):
     out_dict = test_controller.step(test_hercules_dict)
     power_setpoint_test = sum(out_dict["wind_farm"]["turbine_power_setpoints"])
     assert np.isclose(power_setpoint_test, 0)
+
+
+def test_PriceCurtailingController_does_not_mutate_measurements(test_interface_hercules):
+    # Curtailing must zero the setpoint without modifying the caller's measurements dict (AI)
+    test_controller = PriceCurtailingController(
+        interface=test_interface_hercules,
+        cname="solar_farm",
+        controller_parameters={
+            "curtailment_price": 50,
+            "power_tracking_controller": SolarPassthroughController(
+                test_interface_hercules, "solar_farm"
+            ),
+        },
+    )
+    measurements_dict = {"RT_LMP": 25, "solar_farm": {"power_reference": 1000.0}}
+    expected = {"RT_LMP": 25, "solar_farm": {"power_reference": 1000.0}}
+
+    controls_dict = test_controller.compute_controls(measurements_dict)
+
+    assert measurements_dict == expected
+    assert controls_dict["solar_farm"]["power_setpoint"] == 0.0

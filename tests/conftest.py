@@ -1,5 +1,5 @@
 import pytest
-from hycon.interfaces import HerculesADInterface, HerculesHybridADInterface, HerculesInterface
+from hycon.interfaces import HerculesADInterface, HerculesHybridADInterface, HerculesV3Interface
 from hycon.interfaces.interface_base import InterfaceBase
 
 
@@ -37,6 +37,62 @@ def test_hercules_v1_dict():
 
 @pytest.fixture
 def test_hercules_dict():
+    return {
+        "dt": 1,
+        "time": 0,
+        "plant": {"interconnect_limit": None},
+        "wind_farm": {
+            "n_turbines": 2,
+            "capacity_rated": 10000.0,
+            "wind_direction_mean": 271.0,
+            "turbine_powers": [4000.0, 4001.0],
+            "turbine_powers_hypothetical": [4000.0, 4001.0],
+            "power": 8001.0,
+            "power_hypothetical": 8001.0,
+            "wind_speed_mean_background": 10.0,
+            "component_type": "WindFarm",
+            "component_category": "generator",
+        },
+        "solar_farm": {
+            "capacity_rated": 1000.0,
+            "power": 1000.0,  # kW
+            "power_hypothetical": 1200.0,  # kW
+            "DNI": 1000.0,
+            "AOI": 30.0,
+            "component_type": "SolarPySAMPVWatts",
+            "component_category": "generator",
+        },
+        "battery": {
+            "energy_capacity": 40.0e3,
+            "power": 10.0e3,
+            "SOC": 0.3,
+            "power_charge_max": 20e3,
+            "power_discharge_max": 10e3,
+            "component_type": "BatteryDynamic",
+            "component_category": "storage",
+            "SOC_max": 0.95,
+            "SOC_min": 0.05,
+            "allow_grid_charging": False,
+        },
+        "electrolyzer": {
+            "H2_MFR": 0.03,
+            "component_type": "ElectrolyzerPlant",
+            "component_category": "load",
+            "power": -500.0,
+        },
+        "external_signals": {
+            "plant_power_reference": 1000.0,
+            "forecast_ws_mean_0": 8.0,
+            "forecast_ws_mean_1": 8.1,
+            "ws_median_0": 8.1,
+            "hydrogen_reference": 0.02,
+        },
+        "component_names": ["wind_farm", "solar_farm", "battery", "electrolyzer"],
+    }
+
+
+@pytest.fixture
+def test_hercules_v2_dict():
     return {
         "dt": 1,
         "time": 0,
@@ -121,9 +177,9 @@ def test_interface_standin():
 @pytest.fixture
 def test_interface_hercules(test_hercules_dict):
     """
-    Fixture to create a Hercules v2 dictionary for testing.
+    Fixture to create a Hercules v3 interface for testing.
     """
-    return HerculesInterface(test_hercules_dict)
+    return HerculesV3Interface(test_hercules_dict)
 
 
 @pytest.fixture
