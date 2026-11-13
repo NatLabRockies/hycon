@@ -1,5 +1,3 @@
-import copy
-
 import numpy as np
 
 from hycon.controllers.controller_base import ControllerBase
@@ -65,11 +63,10 @@ class PriceCurtailingController(ControllerBase):
         self.store("RT_LMP", measurements_dict["RT_LMP"])
 
         # Threshold based on curtailment price
-        measurements_dict_local = copy.deepcopy(measurements_dict)
+        measurements_dict_local = dict(measurements_dict)
+        measurements_dict_local[self.cname] = dict(measurements_dict[self.cname])
         if measurements_dict_local["RT_LMP"] <= self.curtailment_price:
             measurements_dict_local[self.cname]["power_reference"] = 0.0
-        else:
-            pass
 
         # Compute controls using the underlying power_tracking_controller
         controls_dict = self.power_tracking_controller.compute_controls(measurements_dict_local)
