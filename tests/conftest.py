@@ -36,7 +36,7 @@ def test_hercules_v1_dict():
 
 
 @pytest.fixture
-def test_hercules_dict():
+def test_hercules_v3_dict():
     return {
         "dt": 1,
         "time": 0,
@@ -175,11 +175,11 @@ def test_interface_standin():
 
 
 @pytest.fixture
-def test_interface_hercules(test_hercules_dict):
+def test_interface_hercules(test_hercules_v3_dict):
     """
     Fixture to create a Hercules v3 interface for testing.
     """
-    return HerculesV3Interface(test_hercules_dict)
+    return HerculesV3Interface(test_hercules_v3_dict)
 
 
 @pytest.fixture

@@ -10,7 +10,7 @@ from hycon.interfaces import HerculesInterface, HerculesV2Interface, HerculesV3I
         pytest.param(
             (
                 HerculesV3Interface,
-                "test_hercules_dict",
+                "test_hercules_v3_dict",
                 "capacity_rated",
                 "power_discharge_max",
                 "SOC",
@@ -148,10 +148,10 @@ def test_hercules_interface_hybrid(hercules_case):
     )
 
 
-def test_v3_hypothetical_solar_power(test_hercules_dict):
-    interface = HerculesV3Interface(h_dict=test_hercules_dict)
-    measurements = interface.get_measurements(h_dict=test_hercules_dict)
+def test_v3_hypothetical_solar_power(test_hercules_v3_dict):
+    interface = HerculesV3Interface(h_dict=test_hercules_v3_dict)
+    measurements = interface.get_measurements(h_dict=test_hercules_v3_dict)
     assert (
         measurements["solar_farm"]["power_hypothetical"]
-        == (test_hercules_dict["solar_farm"]["power_hypothetical"])
+        == (test_hercules_v3_dict["solar_farm"]["power_hypothetical"])
     )

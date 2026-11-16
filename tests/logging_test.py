@@ -78,7 +78,7 @@ def test_log_discards_what_if_values():
     assert df["tagged.x"].tolist() == [1.0, 2.0]
 
 
-def test_log_component_controllers(test_hercules_dict, test_interface_hercules):
+def test_log_component_controllers(test_hercules_v3_dict, test_interface_hercules):
     wind = WindFarmPowerDistributingController(test_interface_hercules, "wind_farm")
     solar = SolarPassthroughController(test_interface_hercules, "solar_farm")
     battery = BatteryController(test_interface_hercules, "battery")
@@ -88,8 +88,8 @@ def test_log_component_controllers(test_hercules_dict, test_interface_hercules):
     )
 
     for t in [0.0, 1.0]:
-        test_hercules_dict["time"] = t
-        out = supervisor.step(test_hercules_dict)
+        test_hercules_v3_dict["time"] = t
+        out = supervisor.step(test_hercules_v3_dict)
 
     # Get component log
     df = battery.get_log()
@@ -110,11 +110,12 @@ def test_log_component_controllers(test_hercules_dict, test_interface_hercules):
     # Logged values come from the real call, not the supervisor's what-if query
     assert np.isclose(
         df["battery.error"].iloc[-1],
-        df["battery.processed_reference_power"].iloc[-1] - test_hercules_dict["battery"]["power"],
+        df["battery.processed_reference_power"].iloc[-1]
+        - test_hercules_v3_dict["battery"]["power"],
     )
     assert np.isclose(
         out["battery"]["power_setpoint"],
-        test_hercules_dict["battery"]["power"] + df["battery.incremental_control"].iloc[-1],
+        test_hercules_v3_dict["battery"]["power"] + df["battery.incremental_control"].iloc[-1],
     )
 
 
