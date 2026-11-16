@@ -30,6 +30,10 @@ in a runscript that is running Hercules; used to generate a `controller` from th
 `HerculesInterface` is an alias to the interface for the current Hercules release, currently
 `HerculesV2Interface`.
 
+The v2 and v3 interfaces share the abstract `HerculesInterfaceBase` in
+`hycon.interfaces.hercules_interface`. The versioned modules remain available for
+compatibility with existing imports. Hercules v1 interfaces use a different data layout.
+
 ### HerculesV2Interface
 For Hercules v2 (the current release). Reads the Hercules v2 key names (e.g. `soc`,
 `charge_rate`, `capacity`).

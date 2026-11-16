@@ -3,6 +3,8 @@ from hycon.interfaces.interface_base import InterfaceBase
 
 
 class HerculesV1ADInterface(InterfaceBase):
+    available_controls = ("yaw_angles", "power_setpoint")
+
     def __init__(self, hercules_dict):
         super().__init__()
 
@@ -57,12 +59,7 @@ class HerculesV1ADInterface(InterfaceBase):
         return measurements
 
     def check_controls(self, controls_dict):
-        available_controls = ["yaw_angles", "power_setpoint"]
-
-        for c in controls_dict.keys():
-            for k in controls_dict[c].keys():
-                if k not in available_controls:
-                    raise ValueError("Setpoint " + k + " is not available in this configuration.")
+        super().check_controls(controls_dict)
 
     def send_controls(self, hercules_dict, controls_dict):
         yaw_angles = controls_dict["wind_farm"].get("yaw_angles", [-1000] * self.n_turbines)
@@ -79,6 +76,8 @@ class HerculesV1ADInterface(InterfaceBase):
 
 
 class HerculesV1HybridADInterface(InterfaceBase):
+    available_controls = ("power_setpoint", "yaw_angles")
+
     def __init__(self, hercules_dict):
         super().__init__()
 
@@ -202,15 +201,7 @@ class HerculesV1HybridADInterface(InterfaceBase):
         return measurements
 
     def check_controls(self, controls_dict):
-        available_controls = [
-            "power_setpoint",
-            "yaw_angles",
-        ]
-
-        for c in controls_dict.keys():
-            for k in controls_dict[c].keys():
-                if k not in available_controls:
-                    raise ValueError("Setpoint " + k + " is not available in this configuration.")
+        super().check_controls(controls_dict)
 
     def send_controls(
         self,
@@ -243,6 +234,8 @@ class HerculesV1HybridADInterface(InterfaceBase):
 
 
 class HerculesV1BatteryInterface(InterfaceBase):
+    available_controls = ("power_setpoint",)
+
     def __init__(self, hercules_dict):
         super().__init__()
 
@@ -287,12 +280,7 @@ class HerculesV1BatteryInterface(InterfaceBase):
         return measurements
 
     def check_controls(self, controls_dict):
-        available_controls = ["power_setpoint"]
-
-        for c in controls_dict.keys():
-            for k in controls_dict[c].keys():
-                if k not in available_controls:
-                    raise ValueError("Setpoint " + k + " is not available in this configuration.")
+        super().check_controls(controls_dict)
 
     def send_controls(self, hercules_dict, controls_dict):
         hercules_dict["py_sims"]["inputs"].update(
