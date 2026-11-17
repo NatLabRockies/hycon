@@ -130,21 +130,22 @@ class HerculesInterfaceBase(InterfaceBase):
         return measurements
 
     def send_controls(self, h_dict, controls_dict):
-        controls_dict = copy.deepcopy(controls_dict)
         for c in self.component_names:
             if c in controls_dict:
+                # Shallow copy so renaming keys below doesn't mutate the caller's controls_dict
+                component_controls = dict(controls_dict[c])
                 c_type = self.component_types[c]
                 if c_type in self.wind_types:
-                    if "power_setpoint" not in controls_dict[c]:
+                    if "power_setpoint" not in component_controls:
                         raise ValueError(
                             "Missing required control 'power_setpoint' for wind component "
                             + c
                             + "."
                         )
-                    controls_dict[c]["turbine_power_setpoints"] = controls_dict[c].pop(
+                    component_controls["turbine_power_setpoints"] = component_controls.pop(
                         "power_setpoint"
                     )
-                h_dict[c] = h_dict[c] | controls_dict[c]
+                h_dict[c] = h_dict[c] | component_controls
 
         return h_dict
 

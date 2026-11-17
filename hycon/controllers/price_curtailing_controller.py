@@ -63,7 +63,7 @@ class PriceCurtailingController(ControllerBase):
         self.store("RT_LMP", measurements_dict["RT_LMP"])
 
         # Threshold based on curtailment price
-        measurements_dict_local = dict(measurements_dict)
+        measurements_dict_local = dict(measurements_dict)  # Only a shallow copy needed
         measurements_dict_local[self.cname] = dict(measurements_dict[self.cname])
         if measurements_dict_local["RT_LMP"] <= self.curtailment_price:
             measurements_dict_local[self.cname]["power_reference"] = 0.0

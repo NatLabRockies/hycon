@@ -104,7 +104,7 @@ class HybridSupervisoryControllerGeneric(ControllerBase):
             ):
                 # Ask to charge at the full charge rate---this will then indicate whether the
                 # storage would like to charge, for more complex battery controllers.
-                standin_measurements_dict = dict(measurements_dict)
+                standin_measurements_dict = dict(measurements_dict)  # Only a shallow copy needed
                 standin_measurements_dict[cc.cname] = dict(measurements_dict[cc.cname])
                 standin_measurements_dict[cc.cname]["power_reference"] = -cc.plant_parameters[
                     cc.cname

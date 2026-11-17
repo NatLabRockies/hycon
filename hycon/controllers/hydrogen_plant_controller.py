@@ -1,5 +1,3 @@
-import copy
-
 from hycon.controllers.controller_base import ControllerBase
 
 
@@ -71,7 +69,7 @@ class HydrogenPlantController(ControllerBase):
         if self.generator_controller:
             # Create exhaustive generator measurements dict to handle variety
             # of possible lower-level controllers
-            generator_measurements_dict = copy.deepcopy(measurements_dict)
+            generator_measurements_dict = dict(measurements_dict)  # Only a shallow copy needed
             generator_measurements_dict["power_reference"] = power_reference
             # Remove any external power reference
             if "plant_power_reference" in generator_measurements_dict:
