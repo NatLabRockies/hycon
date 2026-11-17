@@ -78,7 +78,7 @@ def test_PriceCurtailingController(test_hercules_v3_dict, test_interface_hercule
 
 
 def test_PriceCurtailingController_does_not_mutate_measurements(test_interface_hercules):
-    # Curtailing must zero the setpoint without modifying the caller's measurements dict (AI)
+    # Curtailing must zero the setpoint without modifying the caller's measurements dict
     test_controller = PriceCurtailingController(
         interface=test_interface_hercules,
         cname="solar_farm",
