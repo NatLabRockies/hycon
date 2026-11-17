@@ -427,6 +427,8 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#available-interfaces">Available interfaces</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#herculesinterface">HerculesInterface</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#herculesv2interface">HerculesV2Interface</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#herculesv3interface">HerculesV3Interface</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interfaces-in-development">Interfaces in development</a><ul class="nav section-nav flex-column">
@@ -455,14 +457,17 @@ document.write(`
 Hycon with various simulation platforms and other repositories. Each controller
 run will require an <code class="docutils literal notranslate"><span class="pre">interface</span></code>, which is an instantiated object of a class
 in this library. All interface classes should inherit from <code class="docutils literal notranslate"><span class="pre">InterfaceBase</span></code>,
-which can be found n interface_base.py, and should implement three methods:</p>
+which can be found in interface_base.py. They must implement <code class="docutils literal notranslate"><span class="pre">get_measurements()</span></code>
+and <code class="docutils literal notranslate"><span class="pre">send_controls()</span></code>; they may inherit or override <code class="docutils literal notranslate"><span class="pre">check_controls()</span></code>:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">get_measurements()</span></code>: Receive measurements from simulation assets and
 organize into a dictionary that the calling controller can utilize. Optionally,
 receives a large dictionary (for example, the Hercules <code class="docutils literal notranslate"><span class="pre">main_dict</span></code>), from which
 useable measurements can be extracted/repackaged for easy use in the controller.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">check_controls()</span></code>: Check that the keys in <code class="docutils literal notranslate"><span class="pre">controls_dict</span></code> are viable for
-the receiving plant.</p></li>
+the receiving plant. The default expects a dictionary of component control
+dictionaries and validates each control name against the subclass’s
+<code class="docutils literal notranslate"><span class="pre">available_controls</span></code>. Override it for other control layouts.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">send_controls()</span></code>: Send controls to the simulation assets. Controls are
 created as specific keyword arguments, which match those controls generated
 by the calling controller. Optionally, receives a large dictionary
@@ -474,9 +479,24 @@ with controls as needed.</p></li>
 <h2>Available interfaces<a class="headerlink" href="#available-interfaces" title="Link to this heading">#</a></h2>
 <section id="herculesinterface">
 <h3>HerculesInterface<a class="headerlink" href="#herculesinterface" title="Link to this heading">#</a></h3>
-<p>For direct python communication with the latest version of Hercules. This should be instantiated
+<p>For direct python communication with the current release of Hercules. This should be instantiated
 in a runscript that is running Hercules; used to generate a <code class="docutils literal notranslate"><span class="pre">controller</span></code> from the Hycon controllers submodule; and that <code class="docutils literal notranslate"><span class="pre">controller</span></code> should be passed to the
 <code class="docutils literal notranslate"><span class="pre">HerculesModel</span></code> after instantiation via <code class="docutils literal notranslate"><span class="pre">HerculesModel.assign_controller()</span></code>. The main purpose for this interface is for sending power reference signals to various types of hybrid plant components modeled in Hercules (and receiving state measurements from the components as well as external signals like electricity price).</p>
+<p><code class="docutils literal notranslate"><span class="pre">HerculesInterface</span></code> is an alias to the interface for the current Hercules release, currently
+<code class="docutils literal notranslate"><span class="pre">HerculesV2Interface</span></code>.</p>
+<p>The v2 and v3 interfaces share the abstract <code class="docutils literal notranslate"><span class="pre">HerculesInterfaceBase</span></code> in
+<code class="docutils literal notranslate"><span class="pre">hycon.interfaces.hercules_interface</span></code>. The versioned modules remain available for
+compatibility with existing imports. Hercules v1 interfaces use a different data layout.</p>
+</section>
+<section id="herculesv2interface">
+<h3>HerculesV2Interface<a class="headerlink" href="#herculesv2interface" title="Link to this heading">#</a></h3>
+<p>For Hercules v2 (the current release). Reads the Hercules v2 key names (e.g. <code class="docutils literal notranslate"><span class="pre">soc</span></code>,
+<code class="docutils literal notranslate"><span class="pre">charge_rate</span></code>, <code class="docutils literal notranslate"><span class="pre">capacity</span></code>).</p>
+</section>
+<section id="herculesv3interface">
+<h3>HerculesV3Interface<a class="headerlink" href="#herculesv3interface" title="Link to this heading">#</a></h3>
+<p>For Hercules v3 (in development). Reads the key names introduced by the Hercules v3 nomenclature
+refactor (e.g. <code class="docutils literal notranslate"><span class="pre">SOC</span></code>, <code class="docutils literal notranslate"><span class="pre">power_charge_max</span></code>, <code class="docutils literal notranslate"><span class="pre">capacity_rated</span></code>).</p>
 </section>
 </section>
 <section id="interfaces-in-development">
@@ -575,6 +595,8 @@ battery.</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#available-interfaces">Available interfaces</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#herculesinterface">HerculesInterface</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#herculesv2interface">HerculesV2Interface</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#herculesv3interface">HerculesV3Interface</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interfaces-in-development">Interfaces in development</a><ul class="nav section-nav flex-column">
