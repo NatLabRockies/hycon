@@ -93,6 +93,11 @@ class ControllerBase(LoggerMixin, metaclass=ABCMeta):
         # hypothetical calculation are discarded by the restore.
         loggers = self._logger_tree()
         memo = {id(logger): logger for logger in loggers}
+        # Interfaces are shared plant/simulator handles, not controller state; don't copy them.
+        for logger in loggers:
+            interface = logger.__dict__.get("_s")
+            if interface is not None:
+                memo[id(interface)] = interface
         snapshots = []
         for logger in loggers:
             logger.__dict__.setdefault("_log_row", {})
