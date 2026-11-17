@@ -13,7 +13,6 @@ class InterfaceBase(metaclass=ABCMeta):
     def get_measurements(self):
         raise NotImplementedError
 
-    @abstractmethod
     def check_controls(self, controls_dict):
         for component in controls_dict:
             for key in controls_dict[component]:

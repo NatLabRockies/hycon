@@ -4,13 +4,16 @@ The `hycon.interfaces` module contains a library of interfaces for connecting
 Hycon with various simulation platforms and other repositories. Each controller
 run will require an `interface`, which is an instantiated object of a class
 in this library. All interface classes should inherit from `InterfaceBase`,
-which can be found n interface_base.py, and should implement three methods:
+which can be found in interface_base.py. They must implement `get_measurements()`
+and `send_controls()`; they may inherit or override `check_controls()`:
 - `get_measurements()`: Receive measurements from simulation assets and
 organize into a dictionary that the calling controller can utilize. Optionally,
 receives a large dictionary (for example, the Hercules `main_dict`), from which
 useable measurements can be extracted/repackaged for easy use in the controller.
 - `check_controls()`: Check that the keys in `controls_dict` are viable for
-the receiving plant.
+the receiving plant. The default expects a dictionary of component control
+dictionaries and validates each control name against the subclass's
+`available_controls`. Override it for other control layouts.
 - `send_controls()`: Send controls to the simulation assets. Controls are
 created as specific keyword arguments, which match those controls generated
 by the calling controller. Optionally, receives a large dictionary

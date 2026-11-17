@@ -1,5 +1,4 @@
 import copy
-from abc import abstractmethod
 
 from hycon.interfaces.interface_base import InterfaceBase
 
@@ -22,7 +21,6 @@ class HerculesInterfaceBase(InterfaceBase):
     battery_soc_max_key: str
     battery_soc_min_key: str
 
-    @abstractmethod
     def __init__(self, h_dict):
         super().__init__()
         self.dt = h_dict["dt"]
@@ -73,9 +71,6 @@ class HerculesInterfaceBase(InterfaceBase):
                 raise ValueError(f"Component '{c}' has unrecognized type '{c_type}' for Hycon.")
 
         self._lmp_da_keys = tuple(f"lmp_da_{h:02d}" for h in range(24))
-
-    def check_controls(self, controls_dict):
-        super().check_controls(controls_dict)
 
     def get_measurements(self, h_dict):
         time = h_dict["time"]
@@ -181,9 +176,6 @@ class HerculesV2Interface(HerculesInterfaceBase):
     battery_soc_max_key = "max_SOC"
     battery_soc_min_key = "min_SOC"
 
-    def __init__(self, h_dict):
-        super().__init__(h_dict)
-
 
 class HerculesV3Interface(HerculesInterfaceBase):
     """Class for interfacing with Hercules v3 simulator."""
@@ -217,9 +209,6 @@ class HerculesV3Interface(HerculesInterfaceBase):
     battery_discharge_rate_key = "power_discharge_max"
     battery_soc_max_key = "SOC_max"
     battery_soc_min_key = "SOC_min"
-
-    def __init__(self, h_dict):
-        super().__init__(h_dict)
 
 
 # Alias to the interface for the current Hercules release

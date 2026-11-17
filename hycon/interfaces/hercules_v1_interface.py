@@ -58,9 +58,6 @@ class HerculesV1ADInterface(InterfaceBase):
 
         return measurements
 
-    def check_controls(self, controls_dict):
-        super().check_controls(controls_dict)
-
     def send_controls(self, hercules_dict, controls_dict):
         yaw_angles = controls_dict["wind_farm"].get("yaw_angles", [-1000] * self.n_turbines)
         power_setpoints = controls_dict["wind_farm"].get(
@@ -200,9 +197,6 @@ class HerculesV1HybridADInterface(InterfaceBase):
 
         return measurements
 
-    def check_controls(self, controls_dict):
-        super().check_controls(controls_dict)
-
     def send_controls(
         self,
         hercules_dict,
@@ -278,9 +272,6 @@ class HerculesV1BatteryInterface(InterfaceBase):
         }
 
         return measurements
-
-    def check_controls(self, controls_dict):
-        super().check_controls(controls_dict)
 
     def send_controls(self, hercules_dict, controls_dict):
         hercules_dict["py_sims"]["inputs"].update(
