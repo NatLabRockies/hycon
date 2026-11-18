@@ -3,6 +3,7 @@ import argparse
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from hercules import HerculesOutput
 
 
@@ -12,6 +13,9 @@ def plot_outputs():
 
     # Create a shortcut to the dataframe
     df = ho.df
+
+    # Load controller dataframe
+    df_controller = pd.read_pickle("outputs/controller_log.p")
 
     fig, axarr = plt.subplots(2, 1, sharex=True)
     fig.set_size_inches(10, 8)
@@ -102,6 +106,40 @@ def plot_outputs():
         color="C1",
         alpha=0.5,
         edgecolor="None",
+    )
+
+    # Plot internal controller signals
+    ax.plot(
+        df["time"],
+        df_controller["battery.bottom_1_DA"],
+        label="24-hour rolling bottom DA price",
+        color="C1",
+        linestyle="-",
+        linewidth=1.0,
+    )
+    ax.plot(
+        df["time"],
+        df_controller["battery.bottom_4_DA"],
+        label="24-hour rolling 4th-lowest DA price",
+        color="C1",
+        linestyle=":",
+        linewidth=1.0,
+    )
+    ax.plot(
+        df["time"],
+        df_controller["battery.top_1_DA"],
+        label="24-hour rolling top DA price",
+        color="C2",
+        linestyle="-",
+        linewidth=1.0,
+    )
+    ax.plot(
+        df["time"],
+        df_controller["battery.top_4_DA"],
+        label="24-hour rolling 4th-highest DA price",
+        color="C2",
+        linestyle=":",
+        linewidth=1.0,
     )
     ax.set_ylim([-50, 50])
     ax.set_ylabel("Price [$/MWh]")

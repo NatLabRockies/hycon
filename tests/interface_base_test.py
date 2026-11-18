@@ -52,6 +52,22 @@ def test_inherited_methods():
     _ = InheritanceTestClassGood()
 
 
+def test_inherited_check_controls():
+    class InheritedControlInterface(InterfaceBase):
+        available_controls = ("power_setpoint",)
+
+        def get_measurements(self):
+            pass
+
+        def send_controls(self):
+            pass
+
+    interface = InheritedControlInterface()
+    interface.check_controls({"wind": {"power_setpoint": 10}, "battery": {}})
+    with pytest.raises(ValueError, match="Setpoint yaw is not available"):
+        interface.check_controls({"wind": {"power_setpoint": 10}, "battery": {"yaw": 0}})
+
+
 def test_all_interfaces_implement_methods():
     # In future, I'd like to dynamically instantiate classes, but the different
     # inputs that they require on __init__ is currently a roadblock, so I'll just

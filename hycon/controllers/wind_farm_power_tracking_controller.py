@@ -76,6 +76,8 @@ class WindFarmPowerDistributingController(ControllerBase):
         else:
             farm_power_reference = POWER_SETPOINT_DEFAULT
 
+        self.store("farm_power_reference", farm_power_reference)
+
         controls_dict = self.turbine_power_references(
             farm_power_reference=farm_power_reference,
             turbine_powers=measurements_dict[self.cname]["turbine_powers"],
@@ -101,9 +103,11 @@ class WindFarmPowerDistributingController(ControllerBase):
         turbine_power_setpoints = np.array(
             [farm_power_reference / self.n_turbines] * self.n_turbines
         )
+        self.store("turbine_power_setpoints_pre_limit", turbine_power_setpoints)
 
         # Apply ramp rate limit
         turbine_power_setpoints = self.apply_ramp_rate_limit(turbine_power_setpoints)
+        self.store("turbine_power_setpoints", turbine_power_setpoints)
 
         return {self.cname: {"power_setpoint": turbine_power_setpoints.tolist()}}
 
@@ -180,6 +184,7 @@ class WindFarmPowerTrackingController(WindFarmPowerDistributingController):
 
         farm_current_power = np.sum(turbine_powers)
         farm_current_error = farm_power_reference - farm_current_power
+        self.store("farm_error", farm_current_error)
 
         self.n_saturated = 0  # TODO: determine whether to use gain scheduling
         if self.n_saturated < self.n_turbines:
@@ -193,10 +198,13 @@ class WindFarmPowerTrackingController(WindFarmPowerDistributingController):
         u = K_p_gs * farm_current_error
 
         delta_P_ref = u
+        self.store("turbine_reference_increment", delta_P_ref)
 
         unclipped_setpoints = np.array(turbine_powers) + delta_P_ref
+        self.store("turbine_power_setpoints_pre_limit", unclipped_setpoints)
 
         # Apply ramp rate limit
         turbine_power_setpoints = self.apply_ramp_rate_limit(unclipped_setpoints)
+        self.store("turbine_power_setpoints", turbine_power_setpoints)
 
         return {self.cname: {"power_setpoint": turbine_power_setpoints.tolist()}}

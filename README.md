@@ -1,15 +1,15 @@
 # Hycon
 
 Hycon is a python-based tool for real-time hybrid power plant control.
-Hycon will primarily be run in simulation, although we intend that it could be 
-used for physical plants in future. 
+Hycon will primarily be run in simulation, although we intend that it could be
+used for physical plants in future.
 
 Hycon provides plant-level (and hybrid plant-level) controls such as
-wake steering control, spatial filtering/consensus, active power control, 
+wake steering control, spatial filtering/consensus, active power control,
 and coordinated control of hybrid power plant assets;
-and creates an entry point for the development of more advanced controllers. 
+and creates an entry point for the development of more advanced controllers.
 
-Hycon will interface with various simulation testbeds and lower level 
+Hycon will interface with various simulation testbeds and lower level
 controllers, including:
 - [Hercules](https://github.com/NatLabRockies/hercules)
 - [FAST.Farm](https://github.com/OpenFAST/openfast)

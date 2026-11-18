@@ -33,8 +33,8 @@ mkdir -p outputs
 echo "Creating yaw offset table and wind data input."
 python3 construct_yaw_offsets.py --yaw_offset_filename inputs/yaw_offsets.pkl --input_wind_filename inputs/amr_standin_data.csv
 
-# Set the helics port to use: 
-#make sure you use the same port number in the amr_input.inp and hercules_input_000.yaml files. 
+# Set the helics port to use:
+#make sure you use the same port number in the amr_input.inp and hercules_input_000.yaml files.
 export HELICS_PORT=32000
 
 # Set up the helics broker and run the simulation

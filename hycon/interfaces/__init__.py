@@ -1,4 +1,8 @@
-from hycon.interfaces.hercules_interface import HerculesInterface
+from hycon.interfaces.hercules_interface import (
+    HerculesInterface,
+    HerculesV2Interface,
+    HerculesV3Interface,
+)
 from hycon.interfaces.hercules_v1_interface import (
     HerculesADInterface,
     HerculesBatteryInterface,

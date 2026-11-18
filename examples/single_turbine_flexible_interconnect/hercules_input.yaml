@@ -10,7 +10,7 @@ starttime_utc: "2018-05-10T00:00:00.00Z"
 endtime_utc: "2018-05-11T00:00:00.00Z"
 verbose: False
 
-plant: 
+plant:
   interconnect_limit: 15000
 
 distributed_wind:
@@ -28,7 +28,7 @@ distributed_wind:
 
 battery:
   component_type: BatterySimple
-  size: 500  # kW size of the battery 
+  size: 500  # kW size of the battery
   energy_capacity: 2000 # total capacity of the battery in kWh (4-hour 500 kW battery)
   charge_rate: 500 # charge rate of the battery in kW
   discharge_rate: 500 # discharge rate of the battery in kW

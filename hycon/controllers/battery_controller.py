@@ -112,6 +112,11 @@ class BatteryController(ControllerBase):
         # Update controller internal state
         self.x = self.a * self.x + self.b * e
 
+        self.store("internal_state", self.x)
+        self.store("processed_reference_power", reference_power)
+        self.store("error", e)
+        self.store("incremental_control", u)
+
         controls_dict = {self.cname: {"power_setpoint": current_power + u}}
 
         return controls_dict
@@ -264,6 +269,10 @@ class BatteryPriceSOCController(ControllerBase):
         top_d = sorted_day_ahead_lmps[-self.duration]
         bottom_1 = sorted_day_ahead_lmps[0]
         top_1 = sorted_day_ahead_lmps[-1]
+        self.store(f"bottom_{self.duration}_DA", bottom_d)
+        self.store(f"top_{self.duration}_DA", top_d)
+        self.store("bottom_1_DA", bottom_1)
+        self.store("top_1_DA", top_1)
 
         # Access the state of charge and LMP in real-time
         soc = measurements_dict[self.cname]["state_of_charge"]
