@@ -2,6 +2,8 @@ from abc import ABCMeta, abstractmethod
 
 
 class InterfaceBase(metaclass=ABCMeta):
+    available_controls: tuple[str, ...]
+
     def __init__(self):
         self._dt = None
         self._plant_parameters = None
@@ -11,9 +13,11 @@ class InterfaceBase(metaclass=ABCMeta):
     def get_measurements(self):
         raise NotImplementedError
 
-    @abstractmethod
-    def check_controls(self):
-        raise NotImplementedError
+    def check_controls(self, controls_dict):
+        for component in controls_dict:
+            for key in controls_dict[component]:
+                if key not in self.available_controls:
+                    raise ValueError("Setpoint " + key + " is not available in this configuration.")
 
     @abstractmethod
     def send_controls(self):

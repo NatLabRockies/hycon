@@ -1,19 +1,22 @@
 # Interfaces
 
-The `hycon.interfaces` module contains a library of interfaces for connecting 
+The `hycon.interfaces` module contains a library of interfaces for connecting
 Hycon with various simulation platforms and other repositories. Each controller
 run will require an `interface`, which is an instantiated object of a class
-in this library. All interface classes should inherit from `InterfaceBase`, 
-which can be found n interface_base.py, and should implement three methods:
-- `get_measurements()`: Receive measurements from simulation assets and 
+in this library. All interface classes should inherit from `InterfaceBase`,
+which can be found in interface_base.py. They must implement `get_measurements()`
+and `send_controls()`; they may inherit or override `check_controls()`:
+- `get_measurements()`: Receive measurements from simulation assets and
 organize into a dictionary that the calling controller can utilize. Optionally,
 receives a large dictionary (for example, the Hercules `main_dict`), from which
 useable measurements can be extracted/repackaged for easy use in the controller.
-- `check_controls()`: Check that the keys in `controls_dict` are viable for 
-the receiving plant.
-- `send_controls()`: Send controls to the simulation assets. Controls are 
+- `check_controls()`: Check that the keys in `controls_dict` are viable for
+the receiving plant. The default expects a dictionary of component control
+dictionaries and validates each control name against the subclass's
+`available_controls`. Override it for other control layouts.
+- `send_controls()`: Send controls to the simulation assets. Controls are
 created as specific keyword arguments, which match those controls generated
-by the calling controller. Optionally, receives a large dictionary 
+by the calling controller. Optionally, receives a large dictionary
 (for example, the Hercules `main_dict`), which can be written to and returned
 with controls as needed.
 
@@ -23,28 +26,43 @@ These methods will all be called in the `step()` method of `ControllerBase`.
 
 ### HerculesInterface
 
-For direct python communication with the latest version of Hercules. This should be instantiated
+For direct python communication with the current release of Hercules. This should be instantiated
 in a runscript that is running Hercules; used to generate a `controller` from the Hycon controllers submodule; and that `controller` should be passed to the
 `HerculesModel` after instantiation via `HerculesModel.assign_controller()`. The main purpose for this interface is for sending power reference signals to various types of hybrid plant components modeled in Hercules (and receiving state measurements from the components as well as external signals like electricity price).
+
+`HerculesInterface` is an alias to the interface for the current Hercules release, currently
+`HerculesV2Interface`.
+
+The v2 and v3 interfaces share the abstract `HerculesInterfaceBase` in
+`hycon.interfaces.hercules_interface`. The versioned modules remain available for
+compatibility with existing imports. Hercules v1 interfaces use a different data layout.
+
+### HerculesV2Interface
+For Hercules v2 (the current release). Reads the Hercules v2 key names (e.g. `soc`,
+`charge_rate`, `capacity`).
+
+### HerculesV3Interface
+For Hercules v3 (in development). Reads the key names introduced by the Hercules v3 nomenclature
+refactor (e.g. `SOC`, `power_charge_max`, `capacity_rated`).
 
 ## Interfaces in development
 
 ### ROSCO_ZMQInterface
-For sending and receiving communications from one or more ROSCO instances 
+For sending and receiving communications from one or more ROSCO instances
 (which are likely connected to OpenFAST and FAST.Farm). Uses ZeroMQ to pass
 messages between workers.
 
 ## Deprecated interfaces
 
 ### HerculesADInterface
-For direct python communication with Hercules v1. This should be instantiated 
-in a runscript that is running Hercules; used to generate a `controller` from 
+For direct python communication with Hercules v1. This should be instantiated
+in a runscript that is running Hercules; used to generate a `controller` from
 the Hycon controllers submodule; and that `controller` should be passed to the
-Hercules `Emulator` upon its instantiation. Support transmitting yaw angles 
+Hercules `Emulator` upon its instantiation. Support transmitting yaw angles
 and power setpoints to wind turbines.
 
 ### HerculesHybridADInterface
-For direct python communication with Hercules v1, when simulating a hybrid 
+For direct python communication with Hercules v1, when simulating a hybrid
 wind/solar/battery plant. Also handles Hercules' hydrogen modules.
 Supports sending power reference signals to each wind turbine in a wind farm,
 as well as a bulk power signal to the solar farm and a bulk power signal to the

@@ -17,7 +17,7 @@ prepare_output_directory()
 
 ### Open loop controller run
 h_dict = load_hercules_input("hercules_input.yaml")
-h_dict["output_file"] = "outputs/hercules_output_ol.h5"
+h_dict["output_dir"] = "outputs_ol"
 
 hmodel = HerculesModel(h_dict)
 
@@ -34,11 +34,14 @@ controller = HybridSupervisoryControllerGeneric(
 hmodel.assign_controller(controller)
 
 hmodel.run()
+# Write the controller log to a file. In future, this will be possible after piping through
+# the HerculesModel object. For demonstrative purposes, we will write the log to a csv here.
+controller.write_log(h_dict["output_dir"] + "/controller_log.p")
 print("Finished running open-loop controller.")
 
 ### Closed loop controller run
 h_dict = load_hercules_input("hercules_input.yaml")
-h_dict["output_file"] = "outputs/hercules_output_cl.h5"
+h_dict["output_dir"] = "outputs_cl"
 
 hmodel = HerculesModel(h_dict)
 
@@ -55,6 +58,7 @@ controller = HybridSupervisoryControllerGeneric(
 hmodel.assign_controller(controller)
 
 hmodel.run()
+controller.write_log(h_dict["output_dir"] + "/controller_log.p")
 print("Finished running closed-loop controller.")
 
 if generate_output_plots:

@@ -1,5 +1,3 @@
-import copy
-
 from hycon.controllers.controller_base import ControllerBase
 
 
@@ -71,7 +69,7 @@ class HydrogenPlantController(ControllerBase):
         if self.generator_controller:
             # Create exhaustive generator measurements dict to handle variety
             # of possible lower-level controllers
-            generator_measurements_dict = copy.deepcopy(measurements_dict)
+            generator_measurements_dict = dict(measurements_dict)  # Only a shallow copy needed
             generator_measurements_dict["power_reference"] = power_reference
             # Remove any external power reference
             if "plant_power_reference" in generator_measurements_dict:
@@ -102,12 +100,15 @@ class HydrogenPlantController(ControllerBase):
         # Input filtering
         a = 0.05
         filtered_power = (1 - a / self.dt) * self.filtered_power_prev + a / self.dt * current_power
+        self.store("filtered_local_power", filtered_power)
 
         # Calculate difference between hydrogen reference and hydrogen actual
         hydrogen_error = hydrogen_reference - hydrogen_output
+        self.store("hydrogen_error", hydrogen_error)
 
         # Apply gain to generator power output
         power_reference = filtered_power + self.K * hydrogen_error
+        self.store("unclipped_power_reference", power_reference)
 
         if power_reference < 0:
             power_reference = 0

@@ -34,7 +34,7 @@ Additionally, the DataFrame produced pads with zero offsets between `ws_min` and
 
 ### Yaw offset rate limits
 
-To limit the rate of change of the yaw offset as a function of wind direction, wind speed, or 
+To limit the rate of change of the yaw offset as a function of wind direction, wind speed, or
 turbulence intensity, use the `apply_static_rate_limits()` function. This will "smooth" the yaw
 offsets to avoid high sensitivity to changes in the lookup table inputs (most obviously, to
 wind direction near the perfectly aligned directions, where optimal offsets often change from
@@ -82,7 +82,7 @@ ___
 
 ### Wake steering offset visualization
 
-Visualization tools for wake steering lookup tables are provided in the 
+Visualization tools for wake steering lookup tables are provided in the
 `hycon.design_tools.wake_steering_visualization` module. There are currently two functions:
 
 - `plot_offsets_wswd_heatmap()` creates a heatmap of offsets by wind speed and wind direction based
@@ -93,4 +93,3 @@ appears in `df_opt`, users will need to specify the turbulence intensity for the
 
 Both functions, as well as many of the design functions described here, are demonstrated in the
 compare_yaw_offset_designs.py python script provided in {ref}`examples_luwakesteer`.
-

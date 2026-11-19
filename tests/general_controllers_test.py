@@ -6,7 +6,7 @@ from hycon.controllers import (
 )
 
 
-def test_PriceCurtailingController(test_hercules_dict, test_interface_hercules):
+def test_PriceCurtailingController(test_hercules_v3_dict, test_interface_hercules):
     """
     Tests that the PriceCurtailingController outputs a reasonable signal
     """
@@ -25,15 +25,15 @@ def test_PriceCurtailingController(test_hercules_dict, test_interface_hercules):
 
     # Test with price above curtailment threshold
     power_setpoint_ref = 1000
-    test_hercules_dict["external_signals"]["lmp_rt"] = 100
-    test_hercules_dict["solar_farm"]["power_reference"] = power_setpoint_ref
-    out_dict = test_controller.step(test_hercules_dict)
+    test_hercules_v3_dict["external_signals"]["lmp_rt"] = 100
+    test_hercules_v3_dict["solar_farm"]["power_reference"] = power_setpoint_ref
+    out_dict = test_controller.step(test_hercules_v3_dict)
     power_setpoint_test = np.array(out_dict["solar_farm"]["power_setpoint"])
     assert np.isclose(power_setpoint_test, power_setpoint_ref)
 
     # Test with price below curtailment threshold
-    test_hercules_dict["external_signals"]["lmp_rt"] = 25
-    out_dict = test_controller.step(test_hercules_dict)
+    test_hercules_v3_dict["external_signals"]["lmp_rt"] = 25
+    out_dict = test_controller.step(test_hercules_v3_dict)
     power_setpoint_test = np.array(out_dict["solar_farm"]["power_setpoint"])
     assert np.isclose(power_setpoint_test, 0)
 
@@ -42,14 +42,14 @@ def test_PriceCurtailingController(test_hercules_dict, test_interface_hercules):
         curtailment_price=-10,
         power_tracking_controller=SolarPassthroughController(test_interface_hercules, "solar_farm"),
     )
-    test_hercules_dict["external_signals"]["lmp_rt"] = -5
-    test_hercules_dict["solar_farm"]["power_reference"] = power_setpoint_ref
-    out_dict = test_controller.step(test_hercules_dict)
+    test_hercules_v3_dict["external_signals"]["lmp_rt"] = -5
+    test_hercules_v3_dict["solar_farm"]["power_reference"] = power_setpoint_ref
+    out_dict = test_controller.step(test_hercules_v3_dict)
     power_setpoint_test = np.array(out_dict["solar_farm"]["power_setpoint"])
     assert np.isclose(power_setpoint_test, power_setpoint_ref)
 
-    test_hercules_dict["external_signals"]["lmp_rt"] = -15
-    out_dict = test_controller.step(test_hercules_dict)
+    test_hercules_v3_dict["external_signals"]["lmp_rt"] = -15
+    out_dict = test_controller.step(test_hercules_v3_dict)
     power_setpoint_test = np.array(out_dict["solar_farm"]["power_setpoint"])
     assert np.isclose(power_setpoint_test, 0)
 
@@ -65,13 +65,34 @@ def test_PriceCurtailingController(test_hercules_dict, test_interface_hercules):
             ),
         },
     )
-    test_hercules_dict["external_signals"]["lmp_rt"] = 100
-    test_hercules_dict["wind_farm"]["power_reference"] = power_setpoint_ref
-    out_dict = test_controller.step(test_hercules_dict)
+    test_hercules_v3_dict["external_signals"]["lmp_rt"] = 100
+    test_hercules_v3_dict["wind_farm"]["power_reference"] = power_setpoint_ref
+    out_dict = test_controller.step(test_hercules_v3_dict)
     power_setpoint_test = sum(out_dict["wind_farm"]["turbine_power_setpoints"])
     assert np.isclose(power_setpoint_test, power_setpoint_ref)
 
-    test_hercules_dict["external_signals"]["lmp_rt"] = 25
-    out_dict = test_controller.step(test_hercules_dict)
+    test_hercules_v3_dict["external_signals"]["lmp_rt"] = 25
+    out_dict = test_controller.step(test_hercules_v3_dict)
     power_setpoint_test = sum(out_dict["wind_farm"]["turbine_power_setpoints"])
     assert np.isclose(power_setpoint_test, 0)
+
+
+def test_PriceCurtailingController_does_not_mutate_measurements(test_interface_hercules):
+    # Curtailing must zero the setpoint without modifying the caller's measurements dict
+    test_controller = PriceCurtailingController(
+        interface=test_interface_hercules,
+        cname="solar_farm",
+        controller_parameters={
+            "curtailment_price": 50,
+            "power_tracking_controller": SolarPassthroughController(
+                test_interface_hercules, "solar_farm"
+            ),
+        },
+    )
+    measurements_dict = {"RT_LMP": 25, "solar_farm": {"power_reference": 1000.0}}
+    expected = {"RT_LMP": 25, "solar_farm": {"power_reference": 1000.0}}
+
+    controls_dict = test_controller.compute_controls(measurements_dict)
+
+    assert measurements_dict == expected
+    assert controls_dict["solar_farm"]["power_setpoint"] == 0.0

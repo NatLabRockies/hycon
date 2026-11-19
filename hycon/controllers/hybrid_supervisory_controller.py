@@ -1,5 +1,3 @@
-import copy
-
 import numpy as np
 
 from hycon.controllers.controller_base import ControllerBase
@@ -73,7 +71,7 @@ class HybridSupervisoryControllerGeneric(ControllerBase):
             self.curtailment_order = list(range(len(component_controllers) - 1, -1, -1))
         elif len(curtailment_order) != len(component_controllers):
             raise ValueError("curtailment_order must be the same length as component_controllers.")
-        elif not all([type(c) is int and c >= 0 for c in curtailment_order]):
+        elif not all([isinstance(c, int) and c >= 0 for c in curtailment_order]):
             raise ValueError(
                 "All entries in curtailment_order must be non-negative integers corresponding to "
                 "indices of component_controllers."
@@ -106,7 +104,8 @@ class HybridSupervisoryControllerGeneric(ControllerBase):
             ):
                 # Ask to charge at the full charge rate---this will then indicate whether the
                 # storage would like to charge, for more complex battery controllers.
-                standin_measurements_dict = copy.deepcopy(measurements_dict)
+                standin_measurements_dict = dict(measurements_dict)  # Only a shallow copy needed
+                standin_measurements_dict[cc.cname] = dict(measurements_dict[cc.cname])
                 standin_measurements_dict[cc.cname]["power_reference"] = -cc.plant_parameters[
                     cc.cname
                 ]["charge_rate"]
@@ -177,5 +176,9 @@ class HybridSupervisoryControllerGeneric(ControllerBase):
             controls_dict.update(cc.compute_controls(measurements_dict))
 
             power_export_total += measurements_dict[cc.cname]["power"]
+
+        # Log variables of interest
+        self.store("locally_generated_power", locally_generated_power_total)
+        self.store("power_export_total", power_export_total)
 
         return controls_dict
