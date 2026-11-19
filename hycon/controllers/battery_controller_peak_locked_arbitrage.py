@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+
 from hycon.controllers.controller_base import ControllerBase
 
 # Peak blocks are not necessarily daily: a morning peak on one day followed by
@@ -39,12 +40,22 @@ class BatteryControllerPeakLockedArbitrage(ControllerBase):
     day-ahead hours before the next peak. Grid charging preserves headroom for
     forecast excess power; actual excess is absorbed regardless of price.
 
-    Besides ``power_setpoint``, each step returns ``charge_price``,
-    ``rt_offer_price`` and ``da_offer_price`` ($/MWh), and 0/1 ``rt_available``
-    and ``in_peak`` flags, so they can be logged as Hercules channels. The DA
-    offer price is planned once per peak block for a full block of discharge
-    and is NaN off peak.
+    Only ``power_setpoint`` is sent to the plant. Each step logs (via ``store``):
+
+    - ``in_peak``, ``RT_available``: 0/1 flags.
+    - ``charge_price``, ``offer_price_RT``, ``offer_price_DA`` ($/MWh). The DA offer
+      price is planned once per peak block for a full block of discharge and is NaN
+      off peak.
+    - ``offer_DA`` (kW): rated discharge power in peak, else 0.
+    - ``offer_RT`` (kW): rated discharge power in peak; off peak when available, the
+      power sustainable for one RT interval from the usable SOC, held from the start of
+      each RT interval; otherwise the charging setpoint (negative) or 0.
+    - ``power_cleared_DA`` (kW): ``offer_DA`` when the DA LMP is at or above the DA
+      offer price, else 0.
+    - ``power_charge_from_excess`` (kW): charging covered by the forecast excess power.
     """
+
+    _no_snapshot_attributes = ("excess_power", "excess_energy", "peak_block_starts")
 
     def __init__(self, interface, cname, controller_parameters={}, verbose=True):
         """
@@ -68,6 +79,10 @@ class BatteryControllerPeakLockedArbitrage(ControllerBase):
         self.min_SOC = self.plant_parameters[self.cname]["state_of_charge_min"]
         self.max_SOC = self.plant_parameters[self.cname]["state_of_charge_max"]
         self.roundtrip_efficiency = self.plant_parameters[self.cname]["roundtrip_efficiency"]
+        if self.roundtrip_efficiency is None:
+            raise ValueError(
+                "BatteryControllerPeakLockedArbitrage requires the battery's roundtrip_efficiency."
+            )
         self.energy_capacity = self.plant_parameters[self.cname]["energy_capacity"]
 
         # Terminal energy to charge from empty to full; energy_capacity is
@@ -101,6 +116,10 @@ class BatteryControllerPeakLockedArbitrage(ControllerBase):
         # The DA offer price is planned once per peak block and held across it.
         self._da_offer_block_start = None
         self._da_offer_price = np.nan
+
+        # The off-peak RT discharge offer is held over each RT interval.
+        self._rt_offer_interval_start = None
+        self._rt_offer_available = 0.0
 
     def set_controller_parameters(
         self,
@@ -435,10 +454,7 @@ class BatteryControllerPeakLockedArbitrage(ControllerBase):
                 and ``self.cname`` (with at least ``state_of_charge``).
 
         Returns:
-            dict: ``{self.cname: {...}}`` with ``power_setpoint`` (kW, charging
-                negative), ``charge_price``, ``rt_offer_price``,
-                ``da_offer_price`` ($/MWh), and 0/1 ``rt_available`` and
-                ``in_peak``.
+            dict: ``{self.cname: {"power_setpoint": ...}}`` (kW, charging negative).
         """
         time_utc = measurements_dict["time_utc"]
         current_hour = time_utc.floor("h")
@@ -490,6 +506,11 @@ class BatteryControllerPeakLockedArbitrage(ControllerBase):
             must_charge or soc <= self.min_SOC or self._rt_plan[0].size == 0
         )
 
+        excess = 0.0
+        if self.excess_power is not None:
+            excess = self.excess_power.asof(time_utc)
+            excess = 0.0 if pd.isna(excess) else max(float(excess), 0.0)
+
         if rt_available and real_time_lmp >= rt_offer_price:
             power_setpoint = self.rated_power_discharging
         elif in_peak:
@@ -502,13 +523,11 @@ class BatteryControllerPeakLockedArbitrage(ControllerBase):
             else:
                 power_setpoint = 0.0
 
-            if self.excess_power is not None:
-                excess = self.excess_power.asof(time_utc)
-                if not pd.isna(excess) and excess > 0:
-                    # Absorb all current excess, up to the charge rating.
-                    power_setpoint = max(
-                        -self.rated_power_charging, min(power_setpoint, -float(excess))
-                    )
+            if excess > 0:
+                # Absorb all current excess, up to the charge rating.
+                power_setpoint = max(
+                    -self.rated_power_charging, min(power_setpoint, -float(excess))
+                )
 
         if (power_setpoint > 0 and soc <= self.min_SOC) or (
             power_setpoint < 0 and soc >= self.max_SOC
@@ -520,13 +539,29 @@ class BatteryControllerPeakLockedArbitrage(ControllerBase):
         power_limit_upper = measurements_dict[self.cname].get("power_limit_upper", np.inf)
         power_setpoint = np.clip(power_setpoint, power_limit_lower, power_limit_upper)
 
-        return {
-            self.cname: {
-                "power_setpoint": power_setpoint,
-                "charge_price": charge_price,
-                "rt_offer_price": rt_offer_price,
-                "da_offer_price": self._da_offer_price,
-                "rt_available": int(rt_available),
-                "in_peak": int(in_peak),
-            }
-        }
+        # Offers and DA clearing (AI)
+        rt_interval_start = time_utc.floor(RT_INTERVAL)
+        if rt_interval_start != self._rt_offer_interval_start:
+            usable_energy = max(0.0, soc - self.min_SOC) * self.energy_capacity
+            self._rt_offer_available = min(
+                self.rated_power_discharging, usable_energy / (RT_INTERVAL / _ONE_HOUR)
+            )
+            self._rt_offer_interval_start = rt_interval_start
+        if in_peak:
+            offer_DA = offer_RT = self.rated_power_discharging
+        else:
+            offer_DA = 0.0
+            offer_RT = self._rt_offer_available if rt_available else min(power_setpoint, 0.0)
+        cleared = in_peak and day_ahead_lmp >= self._da_offer_price
+
+        self.store("in_peak", int(in_peak))
+        self.store("RT_available", int(rt_available))
+        self.store("charge_price", charge_price)
+        self.store("offer_price_RT", rt_offer_price)
+        self.store("offer_price_DA", self._da_offer_price)
+        self.store("offer_DA", offer_DA)
+        self.store("offer_RT", offer_RT)
+        self.store("power_cleared_DA", offer_DA if cleared else 0.0)
+        self.store("power_charge_from_excess", min(max(-power_setpoint, 0.0), excess))
+
+        return {self.cname: {"power_setpoint": power_setpoint}}

@@ -25,14 +25,14 @@ def test_PriceCurtailingController(test_hercules_v3_dict, test_interface_hercule
 
     # Test with price above curtailment threshold
     power_setpoint_ref = 1000
-    test_hercules_v3_dict["external_signals"]["lmp_rt"] = 100
+    test_hercules_v3_dict["external_signals"]["LMP_RT"] = 100
     test_hercules_v3_dict["solar_farm"]["power_reference"] = power_setpoint_ref
     out_dict = test_controller.step(test_hercules_v3_dict)
     power_setpoint_test = np.array(out_dict["solar_farm"]["power_setpoint"])
     assert np.isclose(power_setpoint_test, power_setpoint_ref)
 
     # Test with price below curtailment threshold
-    test_hercules_v3_dict["external_signals"]["lmp_rt"] = 25
+    test_hercules_v3_dict["external_signals"]["LMP_RT"] = 25
     out_dict = test_controller.step(test_hercules_v3_dict)
     power_setpoint_test = np.array(out_dict["solar_farm"]["power_setpoint"])
     assert np.isclose(power_setpoint_test, 0)
@@ -42,13 +42,13 @@ def test_PriceCurtailingController(test_hercules_v3_dict, test_interface_hercule
         curtailment_price=-10,
         power_tracking_controller=SolarPassthroughController(test_interface_hercules, "solar_farm"),
     )
-    test_hercules_v3_dict["external_signals"]["lmp_rt"] = -5
+    test_hercules_v3_dict["external_signals"]["LMP_RT"] = -5
     test_hercules_v3_dict["solar_farm"]["power_reference"] = power_setpoint_ref
     out_dict = test_controller.step(test_hercules_v3_dict)
     power_setpoint_test = np.array(out_dict["solar_farm"]["power_setpoint"])
     assert np.isclose(power_setpoint_test, power_setpoint_ref)
 
-    test_hercules_v3_dict["external_signals"]["lmp_rt"] = -15
+    test_hercules_v3_dict["external_signals"]["LMP_RT"] = -15
     out_dict = test_controller.step(test_hercules_v3_dict)
     power_setpoint_test = np.array(out_dict["solar_farm"]["power_setpoint"])
     assert np.isclose(power_setpoint_test, 0)
@@ -65,13 +65,13 @@ def test_PriceCurtailingController(test_hercules_v3_dict, test_interface_hercule
             ),
         },
     )
-    test_hercules_v3_dict["external_signals"]["lmp_rt"] = 100
+    test_hercules_v3_dict["external_signals"]["LMP_RT"] = 100
     test_hercules_v3_dict["wind_farm"]["power_reference"] = power_setpoint_ref
     out_dict = test_controller.step(test_hercules_v3_dict)
     power_setpoint_test = sum(out_dict["wind_farm"]["turbine_power_setpoints"])
     assert np.isclose(power_setpoint_test, power_setpoint_ref)
 
-    test_hercules_v3_dict["external_signals"]["lmp_rt"] = 25
+    test_hercules_v3_dict["external_signals"]["LMP_RT"] = 25
     out_dict = test_controller.step(test_hercules_v3_dict)
     power_setpoint_test = sum(out_dict["wind_farm"]["turbine_power_setpoints"])
     assert np.isclose(power_setpoint_test, 0)

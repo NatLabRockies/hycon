@@ -8,14 +8,7 @@ from hycon.interfaces.interface_base import InterfaceBase
 class HerculesInterfaceBase(InterfaceBase):
     """Shared implementation for the component-based Hercules interfaces."""
 
-    available_controls = (
-        "power_setpoint",
-        "charge_price",
-        "rt_offer_price",
-        "da_offer_price",
-        "rt_available",
-        "in_peak",
-    )
+    available_controls = ("power_setpoint",)
     data_channel_map: dict[str, str]
     wind_types: list[str]
     solar_types: list[str]
@@ -29,6 +22,8 @@ class HerculesInterfaceBase(InterfaceBase):
     battery_discharge_rate_key: str
     battery_soc_max_key: str
     battery_soc_min_key: str
+    lmp_da_key: str
+    lmp_rt_key: str
 
     def __init__(self, h_dict):
         super().__init__()
@@ -66,7 +61,7 @@ class HerculesInterfaceBase(InterfaceBase):
                     "energy_capacity": h_dict[c]["energy_capacity"],
                     "charge_rate": h_dict[c][self.battery_charge_rate_key],
                     "discharge_rate": h_dict[c][self.battery_discharge_rate_key],
-                    "roundtrip_efficiency": h_dict[c]["roundtrip_efficiency"],
+                    "roundtrip_efficiency": h_dict[c].get("roundtrip_efficiency"),
                     "allow_grid_charging": h_dict[c].get("allow_grid_power_consumption", True),
                     "state_of_charge_max": h_dict[c].get(self.battery_soc_max_key, 1.0),
                     "state_of_charge_min": h_dict[c].get(self.battery_soc_min_key, 0.0),
@@ -80,16 +75,18 @@ class HerculesInterfaceBase(InterfaceBase):
             else:
                 raise ValueError(f"Component '{c}' has unrecognized type '{c_type}' for Hycon.")
 
-        self._lmp_da_keys = tuple(f"lmp_da_{h:02d}" for h in range(24))
+        self._lmp_da_keys = tuple(f"{self.lmp_da_key}_{h:02d}" for h in range(24))
 
     def get_measurements(self, h_dict):
         time = h_dict["time"]
-        time_utc = h_dict["starttime_utc"] + pd.Timedelta(seconds=time)
         measurements = {
             "time": time,
-            "time_utc": time_utc,
             "forecast": {},
         }
+        if "starttime_utc" in h_dict:
+            measurements["time_utc"] = pd.Timestamp(h_dict["starttime_utc"]) + pd.Timedelta(
+                seconds=time
+            )
 
         total_power = 0.0
         local_power = 0.0
@@ -127,12 +124,12 @@ class HerculesInterfaceBase(InterfaceBase):
                         "hydrogen_reference"
                     ]
 
-        if "lmp_da_00" in h_dict["external_signals"]:
+        if self._lmp_da_keys[0] in h_dict["external_signals"]:
             measurements["DA_LMP_24hours"] = [
                 h_dict["external_signals"][k] for k in self._lmp_da_keys
             ]
-        measurements["DA_LMP"] = h_dict["external_signals"].get("lmp_da", None)
-        measurements["RT_LMP"] = h_dict["external_signals"].get("lmp_rt", None)
+        measurements["DA_LMP"] = h_dict["external_signals"].get(self.lmp_da_key, None)
+        measurements["RT_LMP"] = h_dict["external_signals"].get(self.lmp_rt_key, None)
 
         for k in h_dict["external_signals"].keys():
             if "forecast" in k:
@@ -188,6 +185,8 @@ class HerculesV2Interface(HerculesInterfaceBase):
     battery_discharge_rate_key = "discharge_rate"
     battery_soc_max_key = "max_SOC"
     battery_soc_min_key = "min_SOC"
+    lmp_da_key = "lmp_da"
+    lmp_rt_key = "lmp_rt"
 
 
 class HerculesV3Interface(HerculesInterfaceBase):
@@ -222,6 +221,8 @@ class HerculesV3Interface(HerculesInterfaceBase):
     battery_discharge_rate_key = "power_discharge_max"
     battery_soc_max_key = "SOC_max"
     battery_soc_min_key = "SOC_min"
+    lmp_da_key = "LMP_DA"
+    lmp_rt_key = "LMP_RT"
 
 
 # Alias to the interface for the current Hercules release
