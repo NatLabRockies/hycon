@@ -7,6 +7,11 @@ class PriceCurtailingController(ControllerBase):
     """
     Curtails the component if the real-time price drops below a user-defined threshold.
     Otherwise, simply passes through the power reference.
+
+    When the day-ahead LMP and the component's ``power_hypothetical`` are measured, it also
+    logs a day-ahead offer: ``offer_DA`` (kW), the available power capped at the interconnect
+    limit (a perfect day-ahead forecast); ``offer_price_DA`` ($/MWh), the curtailment price;
+    and ``power_cleared_DA`` (kW), the offer when the DA LMP is at or above that price.
     """
 
     def __init__(self, interface, cname, controller_parameters={}, verbose=True):
@@ -61,6 +66,16 @@ class PriceCurtailingController(ControllerBase):
                 + "."
             )
         self.store("RT_LMP", measurements_dict["RT_LMP"])
+
+        available = measurements_dict[self.cname].get("power_hypothetical")
+        DA_LMP = measurements_dict.get("DA_LMP")
+        if available is not None and DA_LMP is not None:
+            limit = self.plant_parameters.get("interconnect_limit")
+            limit = np.inf if limit is None or limit == -1 else limit
+            offer_DA = min(available, limit)
+            self.store("offer_DA", offer_DA)
+            self.store("offer_price_DA", self.curtailment_price)
+            self.store("power_cleared_DA", offer_DA if DA_LMP >= self.curtailment_price else 0.0)
 
         # Threshold based on curtailment price
         measurements_dict_local = dict(measurements_dict)  # Only a shallow copy needed

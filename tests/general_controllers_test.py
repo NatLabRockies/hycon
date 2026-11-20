@@ -96,3 +96,32 @@ def test_PriceCurtailingController_does_not_mutate_measurements(test_interface_h
 
     assert measurements_dict == expected
     assert controls_dict["solar_farm"]["power_setpoint"] == 0.0
+
+
+def test_PriceCurtailingController_logs_DA_offer(test_interface_hercules):
+    # Available power (capped at the 1000 kW POI) is offered day-ahead at the curtailment
+    # price and clears when the DA LMP is at or above it.
+    test_interface_hercules.plant_parameters["interconnect_limit"] = 1000.0
+    test_controller = PriceCurtailingController(
+        interface=test_interface_hercules,
+        cname="solar_farm",
+        controller_parameters={
+            "curtailment_price": 0,
+            "power_tracking_controller": SolarPassthroughController(
+                test_interface_hercules, "solar_farm"
+            ),
+        },
+    )
+    measurements_dict = {
+        "RT_LMP": 25,
+        "DA_LMP": 30,
+        "solar_farm": {"power_reference": 1200.0, "power_hypothetical": 1200.0},
+    }
+    test_controller.compute_controls(measurements_dict)
+    assert test_controller._log_row["offer_DA"] == 1000.0
+    assert test_controller._log_row["offer_price_DA"] == 0
+    assert test_controller._log_row["power_cleared_DA"] == 1000.0
+
+    measurements_dict["DA_LMP"] = -5
+    test_controller.compute_controls(measurements_dict)
+    assert test_controller._log_row["power_cleared_DA"] == 0.0
