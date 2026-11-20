@@ -60,6 +60,11 @@ On return or error, `compute_controls_without_updating_state()` restores the
 pending values from before the hypothetical calculation, discarding values
 stored during it. It does not append a row to the cache.
 
+The hypothetical calculation snapshots and restores each controller's attributes. Large
+attributes that `compute_controls()` never modifies, such as loaded forecast tables, can be
+listed in the class attribute `_no_snapshot_attributes` so they are neither copied nor
+restored.
+
 ## Retrieve and write results
 
 After stepping a controller, retrieve its log as a pandas DataFrame or write it

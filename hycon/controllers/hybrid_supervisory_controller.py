@@ -180,5 +180,8 @@ class HybridSupervisoryControllerGeneric(ControllerBase):
         # Log variables of interest
         self.store("locally_generated_power", locally_generated_power_total)
         self.store("power_export_total", power_export_total)
+        # Rank 0 is curtailed first; lets post-processing apply the same order at the POI (AI)
+        for rank, cidx in enumerate(self.curtailment_order):
+            self.store(f"curtailment_rank_{self.component_controllers[cidx].cname}", rank)
 
         return controls_dict

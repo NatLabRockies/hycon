@@ -1,3 +1,4 @@
+import pandas as pd
 import pytest
 from hycon.interfaces import HerculesInterface, HerculesV2Interface, HerculesV3Interface
 
@@ -155,3 +156,18 @@ def test_v3_hypothetical_solar_power(test_hercules_v3_dict):
         measurements["solar_farm"]["power_hypothetical"]
         == (test_hercules_v3_dict["solar_farm"]["power_hypothetical"])
     )
+
+
+def test_v3_LMP_keys_and_time_utc(test_hercules_v3_dict):
+    # The v3 interface reads uppercase LMP signals and adds time_utc when starttime_utc is set.
+    h_dict = test_hercules_v3_dict
+    h_dict["time"] = 3600.0
+    h_dict["starttime_utc"] = pd.Timestamp("2024-01-01T00:00Z")
+    h_dict["external_signals"].update(
+        {"LMP_RT": 20.0, "LMP_DA": 30.0, **{f"LMP_DA_{h:02d}": float(h) for h in range(24)}}
+    )
+    measurements = HerculesV3Interface(h_dict).get_measurements(h_dict)
+    assert measurements["RT_LMP"] == 20.0
+    assert measurements["DA_LMP"] == 30.0
+    assert measurements["DA_LMP_24hours"] == [float(h) for h in range(24)]
+    assert measurements["time_utc"] == pd.Timestamp("2024-01-01T01:00Z")

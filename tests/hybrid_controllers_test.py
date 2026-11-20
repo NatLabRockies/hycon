@@ -240,6 +240,11 @@ def test_HybridSupervisoryControllerGeneric_limits(test_hercules_v3_dict, test_i
 
     assert np.isclose(battery_setpoint_test, -solar_current)
 
+    # The curtailment order is logged each step; by default the last controller is cut first.
+    last_row = test_controller._log_cache[-1]
+    assert last_row["curtailment_rank_battery"] == 0
+    assert last_row["curtailment_rank_solar_farm"] == 1
+
 
 def test_HydrogenPlantController(test_hercules_v3_dict, test_interface_hercules):
     """
