@@ -68,7 +68,7 @@ class PriceCurtailingController(ControllerBase):
         self.store("RT_LMP", measurements_dict["RT_LMP"])
 
         available = measurements_dict[self.cname].get("power_hypothetical")
-        DA_LMP = measurements_dict.get("DA_LMP")
+        DA_LMP = measurements_dict.get("DA_LMP", None)
         if available is not None and DA_LMP is not None:
             limit = self.plant_parameters.get("interconnect_limit")
             limit = np.inf if limit is None or limit == -1 else limit
