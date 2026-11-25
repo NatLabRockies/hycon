@@ -137,6 +137,16 @@ def test_BatteryController(test_hercules_v3_dict):
     np.isclose(test_setpoint, -50)
 
 
+def test_BatteryController_asymmetric_rates(test_hercules_v3_dict):
+    test_hercules_v3_dict["component_names"] = ["battery"]
+    controller = BatteryController(
+        HerculesV3Interface(test_hercules_v3_dict), "battery",
+        {"k_batt": 0.1, "clipping_thresholds": [0, 0, 1, 1]},  # no SOC taper
+    )
+    assert controller.soc_clipping(0.5, -1e6) == -20e3  # charge at charge rate; gives -10e3
+    assert controller.soc_clipping(0.5, +1e6) == +10e3  # discharge at discharge rate; gives +20e3
+
+
 def test_BatteryPriceSOCController_init(test_hercules_v3_dict):
     test_interface = HerculesV3Interface(test_hercules_v3_dict)
 
