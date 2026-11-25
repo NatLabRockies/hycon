@@ -4,6 +4,7 @@ from hycon.controllers import (
     BatteryPriceSOCController,
 )
 from hycon.interfaces import (
+    HerculesV1HybridADInterface,
     HerculesV3Interface,
 )
 
@@ -146,6 +147,21 @@ def test_BatteryController_asymmetric_rates(test_hercules_v3_dict):
     )
     assert controller.soc_clipping(0.5, -1e6) == -20e3  # charge at charge rate
     assert controller.soc_clipping(0.5, +1e6) == +10e3  # discharge at discharge rate
+
+
+def test_BatteryController_asymmetric_rates_Hercules_v1(test_hercules_v1_dict):
+    test_hercules_v1_dict["component_names"] = ["battery"]
+    controller = BatteryController(
+        HerculesV1HybridADInterface(test_hercules_v1_dict),
+        "battery",
+        {"k_batt": 0.1, "clipping_thresholds": [0, 0, 1, 1]},  # no SOC taper
+    )
+    # Update rates so that they differ from one another, to test asymmetric behavior
+    charge_rate = controller.plant_parameters["battery"]["charge_rate"]
+    discharge_rate = charge_rate / 2
+    controller.plant_parameters["battery"]["discharge_rate"] = discharge_rate
+    assert controller.soc_clipping(0.5, -1e6) == -charge_rate  # charge at charge rate
+    assert controller.soc_clipping(0.5, +1e6) == +discharge_rate  # discharge at discharge rate
 
 
 def test_BatteryPriceSOCController_init(test_hercules_v3_dict):
