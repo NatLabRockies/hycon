@@ -140,7 +140,8 @@ def test_BatteryController(test_hercules_v3_dict):
 def test_BatteryController_asymmetric_rates(test_hercules_v3_dict):
     test_hercules_v3_dict["component_names"] = ["battery"]
     controller = BatteryController(
-        HerculesV3Interface(test_hercules_v3_dict), "battery",
+        HerculesV3Interface(test_hercules_v3_dict),
+        "battery",
         {"k_batt": 0.1, "clipping_thresholds": [0, 0, 1, 1]},  # no SOC taper
     )
     assert controller.soc_clipping(0.5, -1e6) == -20e3  # charge at charge rate
