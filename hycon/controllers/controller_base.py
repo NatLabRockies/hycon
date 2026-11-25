@@ -6,6 +6,10 @@ from hycon.logger import LoggerMixin
 
 
 class ControllerBase(LoggerMixin, metaclass=ABCMeta):
+    # Attributes that compute_controls never modifies (e.g. loaded forecast tables); they are
+    # left out of the compute_controls_without_updating_state snapshot (AI)
+    _no_snapshot_attributes = ()
+
     def __init__(self, interface, cname=None, verbose=True):
         super().__init__()
         self._s = interface
@@ -101,7 +105,11 @@ class ControllerBase(LoggerMixin, metaclass=ABCMeta):
         snapshots = []
         for logger in loggers:
             logger.__dict__.setdefault("_log_row", {})
-            state = {k: v for k, v in logger.__dict__.items() if k != "_log_cache"}
+            state = {
+                k: v
+                for k, v in logger.__dict__.items()
+                if k != "_log_cache" and k not in getattr(logger, "_no_snapshot_attributes", ())
+            }
             snapshots.append((logger, copy.deepcopy(state, memo)))
         try:
             return self.compute_controls(measurements_dict)

@@ -363,3 +363,22 @@ def test_logging_handles_cycles_and_shared_sub_loggers():
 
     battery.reset_log()
     assert supervisor.get_log().empty
+
+
+def test_what_if_skips_no_snapshot_attributes():
+    # Attributes in _no_snapshot_attributes are neither copied nor restored; state is restored.
+    class UncopyableTable(list):
+        def __deepcopy__(self, memo):
+            raise AssertionError("Read-only tables must not be copied.")
+
+    class TableController(LoggingController):
+        _no_snapshot_attributes = ("table",)
+
+    interface = PassthroughInterface()
+    controller = TableController(interface)
+    table = UncopyableTable([1.0, 2.0])
+    controller.table = table
+    controller.compute_controls_without_updating_state({"ref": 100.0, "y": 0.0})
+    assert controller.x == 0.0
+    assert controller.table is table
+    assert controller._s is interface
