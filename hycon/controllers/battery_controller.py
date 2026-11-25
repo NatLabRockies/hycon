@@ -86,7 +86,7 @@ class BatteryController(ControllerBase):
         r_charge = clip_fraction * self.plant_parameters[self.cname]["charge_rate"]
         r_discharge = clip_fraction * self.plant_parameters[self.cname]["discharge_rate"]
 
-        return np.clip(reference_power, -r_discharge, r_charge)
+        return np.clip(reference_power, -r_charge, r_discharge)
 
     def compute_controls(self, measurements_dict):
         """
